@@ -18,7 +18,6 @@ import LogoutIcon from "@/assets/icons/logout.svg";
 import { tokens } from "@/utils/tokens";
 
 import { IToken } from "@/interfaces/interface";
-import usePageRouter from "@/hooks/usePageRouter";
 import Footer from "@/components/Footer";
 
 interface INavProps {
@@ -38,8 +37,6 @@ function Nav(props: INavProps) {
 
 export default function Home() {
 
-  const pageRouter = usePageRouter();
-
   const [show, setShow] = useState(false);
   const [connected, setConnected] = useState(false);
   const [settings, setSettings] = useState(false);
@@ -52,7 +49,7 @@ export default function Home() {
       <div className="flex justify-between">
         <h2 className=" text-white text_20_700_SFText">Swap</h2>
         <div className="grid grid-cols-4 gap-2">
-          <Nav icon={SwapIcon} label="swap" click={pageRouter.gotoSearch} />
+          <Nav icon={SwapIcon} label="swap" />
           <Nav icon={ReloadIcon} label="reload" />
           <Nav icon={SettingIcon} label="setting" click={() => setSettings(true)} />
           <Nav icon={LogoutIcon} label="logout" />

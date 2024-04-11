@@ -7,6 +7,7 @@ import { IToken } from "@/interfaces/interface";
 
 interface ITokenProps {
     token: IToken;
+    select:() => void;
 }
 
 function TokenIcon(props: { icon: StaticImageData; name: string; }) {
@@ -18,7 +19,7 @@ function TokenName(props: { name: string }) {
 }
 
 export function SuggestedToken(props: ITokenProps) {
-    return <Box className="flex py-2">
+    return <Box className="flex py-2" click={props.select}>
         <Flex className="!w-fit m-auto gap-2">
             <TokenIcon icon={props.token.icon} name={props.token.name} />
             <TokenName name={props.token.name} />
@@ -27,7 +28,7 @@ export function SuggestedToken(props: ITokenProps) {
 }
 
 export function ListToken(props: ITokenProps) {
-    return <Flex className="justify-between">
+    return <Flex className="justify-between" click={props.select}>
         <Flex className="!w-fit gap-4">
             <TokenIcon icon={props.token.icon} name={props.token.name} />
             <TokenName name={props.token.name} />

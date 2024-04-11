@@ -1,10 +1,14 @@
+import { useState } from "react";
 import Image from "next/image";
-import { Flex } from "@/components/wrapper";
+import { Flex, Grid } from "@/components/wrapper";
+import SearchInput from "@/components/Form/SearchInput";
+import { SuggestedToken, ListToken } from "@/components/Token";
+
+import { tokens } from "@/utils/tokens";
+import ArrowUp from "@/assets/icons/down.svg";
 
 import { IToken } from "@/interfaces/interface";
-
-import ArrowUp from "@/assets/icons/down.svg";
-import { useState } from "react";
+import Footer from "../Footer";
 
 interface ISelectorProps {
     selectedToken: IToken;
@@ -12,32 +16,61 @@ interface ISelectorProps {
     tokens: IToken[];
 }
 
+
+export default function Search(props: { selectToken: (token: IToken) => void; }) {
+
+    const [search, setSearch] = useState("");
+
+    function filter(token: IToken) {
+        if (!search) return true;
+        if (search.toLocaleLowerCase() === token.name.toLocaleLowerCase()) return true;
+        return false;
+    }
+
+    return <Flex className="flex-col bg-primary absolute top-0 left-0 p-5 h-full">
+        <Grid className="gap-3">
+            <SearchInput value={search} handleSearch={(newValue) => setSearch(newValue)} />
+            <Grid className="grid-cols-3 gap-2">
+                {
+                    tokens.slice(0, 3).map((token, index) => <SuggestedToken
+                        token={token}
+                        key={index}
+                        select={() => props.selectToken(token)}
+                    />)
+                }
+            </Grid>
+        </Grid>
+        <h2 className="text_20_700_SFText text-white my-6">Tokens</h2>
+        <Grid className="w-full gap-6">
+            {
+                tokens.filter(filter).map((token, index) => <ListToken
+                    key={index}
+                    token={token}
+                    select={() => props.selectToken(token)}
+                />)
+            }
+        </Grid>
+        <Footer />
+    </Flex>
+}
+
 export function TokenSelector(props: ISelectorProps) {
     const [show, setShow] = useState(false);
-    return <div className="relative !w-[150px] my-auto px-2">
+    return <div className="!w-[170px] my-auto px-2">
         <Flex className="!w-fit ml-auto" click={() => setShow(!show)}>
             <Image width={24} height={24} className="!w-[24px] !h-[24px]" src={props.selectedToken.icon} alt={props.selectedToken.name} />
-            <Flex className="!w-full gap-2 ml-2 my-auto">
+            <Flex className="!w-full gap-[6px] ml-[6px] my-auto">
                 <span className="block text_14_500_SFText leading-none text-white my-auto">{props.selectedToken.name}</span>
                 <Image src={ArrowUp} alt="down" className="min-w-[4px] my-auto" />
             </Flex>
         </Flex>
         {
-            show && <div className="absolute z-10 rounded-[10px] shadow-md w-full bg-primary">
-                {props.tokens.map((token, index) => {
-                    return <Flex 
-                    key={index} 
-                    className={`gap-2 p-2 ${props.selectedToken.name === token.name ? "opacity-60":""}`} 
-                    click={() => {
-                        props.selectToken(token);
-                        setShow(false);
-                    }}>
-                        <Image width={24} height={24} className="!w-[24px] !h-[24px]" src={token.icon} alt={token.name} />
-                        <span className="block text_14_500_SFText text-white my-auto">{token.name}</span>
-                    </Flex>
-                })}
-
-            </div>
+            show && <Search
+                selectToken={(token) => {
+                    props.selectToken(token);
+                    setShow(!show)
+                }}
+            />
         }
     </div>
 }

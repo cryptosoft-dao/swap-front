@@ -9,7 +9,7 @@ export function PageWrapper(props: IWrapperProps) {
 }
 
 export function Box(props: IWrapperProps) {
-    return <div className={`w-full border border-border_primary rounded-[10px] ${props.className || ""}`}>
+    return <div onClick={props.click} className={`w-full border border-border_primary rounded-[10px] ${props.className || ""}`}>
         {props.children}
     </div>
 }
