@@ -1,0 +1,56 @@
+@font-face {
+  font-family: "SFProText";
+  src: url("../assets/fonts/SFProText/SFProText-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SFProTextMedium";
+  src: url("../assets/fonts/SFProText/SFProText-Medium.ttf") format("truetype");
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SFProTextSemiBold";
+  src: url("../assets/fonts/SFProText/SFProText-Bold.ttf") format("truetype");
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: "SFProTextBold";
+  src: url("../assets/fonts/SFProText/SFProText-Semibold.ttf")
+    format("truetype");
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "SFProDisplayMedium";
+  src: url("../assets/fonts/SFProDisplay/SFProDisplay-Medium.ttf")
+    format("truetype");
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+    font-family: "SFProDisplaySemibold";
+    src: url("../assets/fonts/SFProDisplay/SFProDisplay-Semibold.ttf")
+      format("truetype");
+    font-style: normal;
+    font-display: swap;
+  }
+
+@font-face {
+  font-family: "Inter";
+  src: url("../assets/fonts/Inter/Inter-Regular.ttf") format("truetype");
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "InterMedium";
+  src: url("../assets/fonts/Inter/Inter-Medium.ttf") format("truetype");
+  font-style: normal;
+  font-display: swap;
+}

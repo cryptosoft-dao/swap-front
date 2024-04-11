@@ -22,37 +22,68 @@ body {
 
   .text_14_400_Inter {
     font-size: 14px;
-    font-weight: 400;
+    font-family: "Inter";
   }
 
   .text_14_500_Inter {
     font-size: 14px;
-    font-weight: 500;
+    font-family: "InterMedium";
+  }
+
+  .text_12_500_SFText {
+    font-size: 12px;
+    font-family: 500;
+    font-family: "SFProTextMedium";
   }
 
   .text_14_400_SFText {
     font-size: 14px;
     font-weight: 500;
+    font-family: "SFProTextMedium";
+  }
+
+  .text_12_500_SFText {
+    font-size: 14px;
+    font-weight: 500;
+    font-family: "SFProTextMedium";
   }
 
   .text_14_500_SFText {
     font-size: 14px;
     font-weight: 500;
+    font-family: "SFProTextMedium";
   }
 
   .text_15_400_SFText {
     font-size: 15px;
     font-family: 400;
+    font-family: "SFProText";
+  }
+
+  .text_14_700_SFText {
+    font-size: 15px;
+    font-family: "SFProTextBold";
   }
 
   .text_15_700_SFText {
     font-size: 15px;
-    font-weight: 700;
+    font-family: "SFProTextBold";
   }
 
   .text_20_700_SFText {
     font-size: 20px;
-    font-weight: 700;
+    font-family: "SFProTextBold";
+  }
+
+  .text_24_600_SFText {
+    font-size: 24px;
+    font-family: "SFProTextSemiBold";
+  }
+
+  .text_14_600_SFDisplay {
+    font-size: 14px;
+    font-weight: 600;
+    font-family: "SFProDisplaySemibold";
   }
 
   @keyframes slideUpModal {

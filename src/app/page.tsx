@@ -8,16 +8,18 @@ import { PrimaryButton } from "@/components/Form/Button";
 import { List } from "@/components/List";
 import SettingModal from "@/components/Modal/SetttingsModal";
 
-import SettingIcon from "@/assets/icons/setting.svg";
+import SettingIcon from "@/assets/icons/SettingIcon.svg";
 import ReloadIcon from "@/assets/icons/reload.svg";
 import SwapIcon from "@/assets/icons/swap.svg";
 import ArrowUpIcon from "@/assets/icons/arrow-up.svg";
 import InfoIcon from "@/assets/icons/info.svg";
+import LogoutIcon from "@/assets/icons/logout.svg";
 
 import { tokens } from "@/utils/tokens";
 
 import { IToken } from "@/interfaces/interface";
 import usePageRouter from "@/hooks/usePageRouter";
+import Footer from "@/components/Footer";
 
 interface INavProps {
   icon: StaticImageData;
@@ -28,7 +30,7 @@ interface INavProps {
 function Nav(props: INavProps) {
   return <div
     onClick={props.click}
-    className="flex w-[30px] h-[30px] border border-border_primary rounded-full cursor-pointer"
+    className="flex w-[32px] h-[32px] border border-border_primary rounded-full cursor-pointer"
   >
     <Image className="m-auto" src={props.icon} alt={props.label} />
   </div>
@@ -46,13 +48,14 @@ export default function Home() {
   const [receiveToken, setReceiveToken] = useState<IToken>(tokens[1]);
 
   return (
-    <div className="w-full">
+    <Flex className="flex-col h-full">
       <div className="flex justify-between">
         <h2 className=" text-white text_20_700_SFText">Swap</h2>
-        <div className="grid grid-cols-3 gap-2">
+        <div className="grid grid-cols-4 gap-2">
           <Nav icon={SwapIcon} label="swap" click={pageRouter.gotoSearch} />
           <Nav icon={ReloadIcon} label="reload" />
           <Nav icon={SettingIcon} label="setting" click={() => setSettings(true)} />
+          <Nav icon={LogoutIcon} label="logout" />
         </div>
       </div>
       <Grid className="gap-4 mt-8">
@@ -72,10 +75,10 @@ export default function Home() {
           error="No liquidity"
         />
       </Grid>
-      {connected ? <PrimaryButton name="Swap" className="my-4" /> : <PrimaryButton click={() => setConnected(true)} name="Connect Wallet" className="my-4" />}
+      {connected ? <PrimaryButton name="Swap" className="my-4" /> : <PrimaryButton click={() => setConnected(true)} name="Connect" className="my-4" />}
       <div className="py-1">
         <Flex className="gap-2" click={() => setShow(!show)}>
-          <span className="text_14_500_Inter text-white leading-[16px]">Swap details</span>
+          <span className="text_14_500_SFText text-white leading-[16px]">Swap details</span>
           <Image src={ArrowUpIcon} alt="arrow-up" className="my-auto" />
         </Flex>
         {
@@ -90,7 +93,8 @@ export default function Home() {
           </Grid>
         }
       </div>
+      <Footer />
       <SettingModal active={settings} close={() => setSettings(false)} />
-    </div>
+    </Flex>
   );
 }

@@ -21,8 +21,8 @@ interface ITokenFieldProps extends ISwapFieldProps {
 export function SwapField(props: ISwapFieldProps) {
     return <Box className={`flex px-[6px] py-[9px] ${props.error ? "!border-red" : ""}`}>
         <div className="w-full flex pl-2 pr-4 border-r border-border_primary">
-            <input className="w-full outline-none bg-transparent font-[600] text-2xl text-white" value={props.value} readOnly={props.readonly} />
-            <span className="text-text_primary my-auto text-[14px] font-[500]">{`~$${props.price}`}</span>
+            <input className="w-full outline-none bg-transparent text_24_600_SFText text-white" value={props.value} readOnly={props.readonly} />
+            <span className="text-text_primary my-auto text_14_500_SFText">{`≈$${props.price}`}</span>
         </div>
         <TokenSelector
             tokens={props.tokens}
@@ -33,7 +33,7 @@ export function SwapField(props: ISwapFieldProps) {
 }
 
 function Label(props: { label: string; className?: string }) {
-    return <span className={`text-text_primary text-[12px] font-[500] leading-none ${props.className}`}>{props.label}</span>
+    return <span className={`text-text_primary text_12_500_SFText leading-none ${props.className}`}>{props.label}</span>
 }
 
 function TokenField(props: ITokenFieldProps) {
