@@ -1,9 +1,16 @@
-import { Box } from "../wrapper";
+import { tokens } from "@/utils/tokens";
+import { Box, Flex } from "../wrapper";
+import { TokenSelector } from "./TokenSelector";
+import { IToken } from "@/interfaces/interface";
 
 interface ISwapFieldProps {
     value: number;
     price: number;
     readonly?: boolean;
+    tokens: IToken[];
+    selectedToken: IToken;
+    selectToken: (token: IToken) => void;
+    error?: string;
 }
 
 interface ITokenFieldProps extends ISwapFieldProps {
@@ -12,27 +19,37 @@ interface ITokenFieldProps extends ISwapFieldProps {
 };
 
 export function SwapField(props: ISwapFieldProps) {
-    return <Box className="flex px-[6px] py-[9px] my-2">
+    return <Box className={`flex px-[6px] py-[9px] ${props.error ? "!border-red" : ""}`}>
         <div className="w-full flex pl-2 pr-4 border-r border-border_primary">
             <input className="w-full outline-none bg-transparent font-[600] text-2xl text-white" value={props.value} readOnly={props.readonly} />
             <span className="text-text_primary my-auto text-[14px] font-[500]">{`~$${props.price}`}</span>
         </div>
+        <TokenSelector
+            tokens={props.tokens}
+            selectedToken={props.selectedToken}
+            selectToken={props.selectToken}
+        />
     </Box>
 }
 
 function Label(props: { label: string; className?: string }) {
-    return <span className={`text-text_primary text-[12px] font-[500] ${props.className}`}>{props.label}</span>
+    return <span className={`text-text_primary text-[12px] font-[500] leading-none ${props.className}`}>{props.label}</span>
 }
 
 function TokenField(props: ITokenFieldProps) {
-    return <div className="w-full">
+    return <Flex className="flex-col gap-2">
         {props.label}
         <SwapField
             value={props.value}
             price={props.price}
             readonly={props.readonly}
+            tokens={props.tokens}
+            selectToken={props.selectToken}
+            selectedToken={props.selectedToken}
+            error={props.error}
         />
-    </div>
+        {props.error && <Label className="!text-red" label={props.error} />}
+    </Flex>
 }
 
 export function SendTokenField(props: ISwapFieldProps) {
@@ -50,6 +67,10 @@ export function SendTokenField(props: ISwapFieldProps) {
         value={props.value}
         price={props.price}
         readonly={props.readonly}
+        tokens={props.tokens}
+        selectToken={props.selectToken}
+        selectedToken={props.selectedToken}
+        error={props.error}
     />
 }
 
@@ -64,5 +85,9 @@ export function ReceiveTokenField(props: ISwapFieldProps) {
         value={props.value}
         price={props.price}
         readonly={props.readonly}
+        tokens={props.tokens}
+        selectToken={props.selectToken}
+        selectedToken={props.selectedToken}
+        error={props.error}
     />
 }

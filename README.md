@@ -1,8 +1,6 @@
 This is a [Next.js](https://nextjs.org/) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
 
-## TicTon Mini App
-
-First, run the development server:
+## To run the server
 
 ```bash
 npm run dev
@@ -14,10 +12,3 @@ pnpm dev
 bun dev
 ```
 
-### Overview
-
-- **Objective**: Telegram miniapp that allows users to interact with the decentralized Oracle TICTON through a user-friendly interface.
-- **Target Audience**: General public
-    - Those who want to provide quotes to earn reward income.
-    - Those looking to correct inaccurate prices to earn arbitrage profits.
-- **Pages**: Welcome, Landing, Select Pair, Play Page, Tick, Wind, Animation Transition, User Page

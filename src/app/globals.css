@@ -19,12 +19,52 @@ body {
   .text-balance {
     text-wrap: balance;
   }
+
+  .text_14_400_Inter {
+    font-size: 14px;
+    font-weight: 400;
+  }
+
   .text_14_500_Inter {
     font-size: 14px;
     font-weight: 500;
   }
-  .text_14_400_Inter {
+
+  .text_14_400_SFText {
     font-size: 14px;
-    font-weight: 400;
+    font-weight: 500;
+  }
+
+  .text_14_500_SFText {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  .text_15_400_SFText {
+    font-size: 15px;
+    font-family: 400;
+  }
+
+  .text_15_700_SFText {
+    font-size: 15px;
+    font-weight: 700;
+  }
+
+  .text_20_700_SFText {
+    font-size: 20px;
+    font-weight: 700;
+  }
+
+  @keyframes slideUpModal {
+    0% {
+      transform: translateY(100%);
+    }
+    100% {
+      transform: translateY(0%);
+    }
+  }
+
+  .slideUpModal {
+    animation: slideUpModal ease-in 0.4s;
   }
 }

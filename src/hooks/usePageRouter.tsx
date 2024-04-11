@@ -7,6 +7,7 @@ type IVoidFunc = () => void;
 
 export default function usePageRouter(): {
     gotoHome: IVoidFunc;
+    gotoSearch: IVoidFunc;
     back: IVoidFunc;
 } {
     const router = useRouter();
@@ -17,6 +18,7 @@ export default function usePageRouter(): {
 
     return {
         gotoHome: () => goto(pageLinks.home),
+        gotoSearch: () => goto(pageLinks.search),
         back: router.back
     }
 }

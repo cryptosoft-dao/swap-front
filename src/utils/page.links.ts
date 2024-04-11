@@ -1,5 +1,6 @@
 const PAGES = {
-  home: "/"
+  home: "/",
+  search:"/search"
 };
 
 export default PAGES;
