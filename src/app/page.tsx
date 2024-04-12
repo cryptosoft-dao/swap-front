@@ -8,7 +8,7 @@ import { PrimaryButton } from "@/components/Form/Button";
 import { List } from "@/components/List";
 import SettingModal from "@/components/Modal/SetttingsModal";
 
-import SettingIcon from "@/assets/icons/SettingIcon.svg";
+import SettingIcon from "@/assets/icons/setting.png";
 import ReloadIcon from "@/assets/icons/reload.svg";
 import SwapIcon from "@/assets/icons/swap.svg";
 import ArrowUpIcon from "@/assets/icons/arrow-up.svg";
@@ -19,6 +19,7 @@ import { tokens } from "@/utils/tokens";
 
 import { IToken } from "@/interfaces/interface";
 import Footer from "@/components/Footer";
+import { InfoModal, ProgressModal } from "@/components/Modal/Modal";
 
 interface INavProps {
   icon: StaticImageData;
@@ -31,7 +32,7 @@ function Nav(props: INavProps) {
     onClick={props.click}
     className="flex w-[32px] h-[32px] border border-border_primary rounded-full cursor-pointer"
   >
-    <Image className="m-auto" src={props.icon} alt={props.label} />
+    <Image className="m-auto w-[16px] h-[16px]" src={props.icon} alt={props.label} />
   </div>
 }
 
@@ -39,8 +40,9 @@ export default function Home() {
 
   const [show, setShow] = useState(false);
   const [connected, setConnected] = useState(false);
-  const [settings, setSettings] = useState(false);
+  const [modal, setModal] = useState("");
 
+  const [sendAmount, setSendAmount] = useState(0);
   const [sendToken, setSendToken] = useState<IToken>(tokens[0]);
   const [receiveToken, setReceiveToken] = useState<IToken>(tokens[1]);
 
@@ -51,37 +53,47 @@ export default function Home() {
         <div className="grid grid-cols-4 gap-2">
           <Nav icon={SwapIcon} label="swap" />
           <Nav icon={ReloadIcon} label="reload" />
-          <Nav icon={SettingIcon} label="setting" click={() => setSettings(true)} />
+          <Nav icon={SettingIcon} label="setting" click={() => setModal("settings")} />
           <Nav icon={LogoutIcon} label="logout" />
         </div>
       </div>
       <Grid className="gap-4 mt-8">
         <SendTokenField
-          value={100}
-          price={632}
+          value={sendAmount}
+          price={sendAmount * 2.1}
+          change={(value) => setSendAmount(value)}
           tokens={tokens}
           selectedToken={sendToken}
           selectToken={(token) => setSendToken(token)}
         />
         <ReceiveTokenField
-          value={100}
-          price={632}
+          value={Number.parseFloat((sendAmount * 2.24).toFixed(2))}
+          price={sendAmount * 2.24 * 2.1}
+          readonly={true}
           tokens={tokens}
           selectedToken={receiveToken}
           selectToken={(token) => setReceiveToken(token)}
           error="No liquidity"
         />
       </Grid>
-      {connected ? <PrimaryButton name="Swap" className="my-4" /> : <PrimaryButton click={() => setConnected(true)} name="Connect" className="my-4" />}
+      {connected ? <PrimaryButton
+        name="Swap"
+        className="my-4"
+        click={() => setModal("progress")}
+      /> : <PrimaryButton
+        click={() => setConnected(true)}
+        name={sendAmount && !connected ? "Connect & Swap" : "Connect"}
+        className="my-4"
+      />}
       <div className="py-1">
         <Flex className="gap-2" click={() => setShow(!show)}>
-          <span className="text_14_500_SFText text-white leading-[16px]">Swap details</span>
+          <span className="text_14_500_SFText text-white leading-[16px] cursor-pointer">Swap details</span>
           <Image src={ArrowUpIcon} alt="arrow-up" className="my-auto" />
         </Flex>
         {
           show && <Grid className="gap-3 my-3">
             <List name="Price" value="1 TON ≈ 2,20 USDT" />
-            <List name="Price impact" icon={InfoIcon} value="-1.31%" valueClassName="!text-red" />
+            <List name="Price impact" icon={InfoIcon} value="-1.31%" valueClassName="!text-red" click={() => setModal('info')} />
             <List name="Minimum received" icon={InfoIcon} value="~ 5 USDT" />
             <List name="Blockchain fee" value="0.08-0.3 TON" />
             <List name="Your economy" value="0.00%" valueClassName="!text-green" />
@@ -91,7 +103,9 @@ export default function Home() {
         }
       </div>
       <Footer />
-      <SettingModal active={settings} close={() => setSettings(false)} />
+      <SettingModal active={modal === "settings"} close={() => setModal("")} />
+      <InfoModal active={modal === "info"} close={() => setModal("")} />
+      <ProgressModal active={modal === "progress"} />
     </Flex>
   );
 }

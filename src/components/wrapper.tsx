@@ -3,7 +3,7 @@ interface IWrapperProps extends React.PropsWithChildren {
     click?: () => void;
 }
 export function PageWrapper(props: IWrapperProps) {
-    return <div className={`w-full h-full p-6 max-w-[480px] bg-primary ${props.className || ""}`}>
+    return <div className={`relative flex flex-col w-full h-full p-6 max-w-[480px] bg-primary ${props.className || ""}`}>
         {props.children}
     </div>
 }

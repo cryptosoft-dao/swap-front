@@ -19,7 +19,7 @@ function TokenName(props: { name: string }) {
 }
 
 export function SuggestedToken(props: ITokenProps) {
-    return <Box className="flex py-2" click={props.select}>
+    return <Box className="flex py-2 cursor-pointer" click={props.select}>
         <Flex className="!w-fit m-auto gap-2">
             <TokenIcon icon={props.token.icon} name={props.token.name} />
             <TokenName name={props.token.name} />
@@ -28,7 +28,7 @@ export function SuggestedToken(props: ITokenProps) {
 }
 
 export function ListToken(props: ITokenProps) {
-    return <Flex className="justify-between" click={props.select}>
+    return <Flex className="justify-between cursor-pointer" click={props.select}>
         <Flex className="!w-fit gap-4">
             <TokenIcon icon={props.token.icon} name={props.token.name} />
             <TokenName name={props.token.name} />

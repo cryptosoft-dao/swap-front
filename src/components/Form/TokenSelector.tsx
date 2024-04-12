@@ -1,6 +1,7 @@
 import { useState } from "react";
 import Image from "next/image";
 import { Flex, Grid } from "@/components/wrapper";
+import Footer from "@/components/Footer";
 import SearchInput from "@/components/Form/SearchInput";
 import { SuggestedToken, ListToken } from "@/components/Token";
 
@@ -8,7 +9,6 @@ import { tokens } from "@/utils/tokens";
 import ArrowUp from "@/assets/icons/down.svg";
 
 import { IToken } from "@/interfaces/interface";
-import Footer from "../Footer";
 
 interface ISelectorProps {
     selectedToken: IToken;
@@ -16,8 +16,7 @@ interface ISelectorProps {
     tokens: IToken[];
 }
 
-
-export default function Search(props: { selectToken: (token: IToken) => void; }) {
+function Search(props: { selectToken: (token: IToken) => void; }) {
 
     const [search, setSearch] = useState("");
 
@@ -27,7 +26,7 @@ export default function Search(props: { selectToken: (token: IToken) => void; })
         return false;
     }
 
-    return <Flex className="flex-col bg-primary absolute top-0 left-0 p-5 h-full">
+    return <Flex className="flex-col bg-primary absolute top-0 left-0 p-5 h-full max-w-[480px]">
         <Grid className="gap-3">
             <SearchInput value={search} handleSearch={(newValue) => setSearch(newValue)} />
             <Grid className="grid-cols-3 gap-2">
@@ -57,7 +56,7 @@ export default function Search(props: { selectToken: (token: IToken) => void; })
 export function TokenSelector(props: ISelectorProps) {
     const [show, setShow] = useState(false);
     return <div className="!w-[170px] my-auto px-2">
-        <Flex className="!w-fit ml-auto" click={() => setShow(!show)}>
+        <Flex className="!w-fit ml-auto cursor-pointer" click={() => setShow(!show)}>
             <Image width={24} height={24} className="!w-[24px] !h-[24px]" src={props.selectedToken.icon} alt={props.selectedToken.name} />
             <Flex className="!w-full gap-[6px] ml-[6px] my-auto">
                 <span className="block text_14_500_SFText leading-none text-white my-auto">{props.selectedToken.name}</span>

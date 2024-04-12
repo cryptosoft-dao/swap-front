@@ -20,6 +20,12 @@ body {
     text-wrap: balance;
   }
 
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
   .text_14_400_Inter {
     font-size: 14px;
     font-family: "Inter";
@@ -95,7 +101,20 @@ body {
     }
   }
 
+  @keyframes rotate {
+    from {
+      transform: rotate(0deg);
+    }
+    to {
+      transform: rotate(360deg);
+    }
+  }
+
   .slideUpModal {
     animation: slideUpModal ease-in 0.4s;
+  }
+
+  .infiniteRotate {
+    animation: rotate linear 0.3s;
   }
 }

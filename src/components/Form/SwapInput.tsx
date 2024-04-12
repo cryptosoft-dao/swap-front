@@ -6,6 +6,7 @@ import { IToken } from "@/interfaces/interface";
 interface ISwapFieldProps {
     value: number;
     price: number;
+    change?: (value: number) => void;
     readonly?: boolean;
     tokens: IToken[];
     selectedToken: IToken;
@@ -21,8 +22,14 @@ interface ITokenFieldProps extends ISwapFieldProps {
 export function SwapField(props: ISwapFieldProps) {
     return <Box className={`flex px-[6px] py-[9px] ${props.error ? "!border-red" : ""}`}>
         <div className="w-full flex pl-2 pr-4 border-r border-border_primary">
-            <input className="w-full outline-none bg-transparent text_24_600_SFText text-white" value={props.value} readOnly={props.readonly} />
-            <span className="text-text_primary my-auto text_14_500_SFText">{`≈$${props.price}`}</span>
+            <input
+                className="w-full outline-none bg-transparent text_24_600_SFText text-white"
+                value={!props.value ? "" : props.value}
+                readOnly={props.readonly}
+                type="number"
+                onChange={(event) => props.change && props.change(Number.parseFloat(event.currentTarget.value))}
+            />
+            <span className="text-text_primary my-auto text_14_500_SFText">{`≈$${isNaN(props.price) || !props.price ? "0" : props.price.toFixed(3)}`}</span>
         </div>
         <TokenSelector
             tokens={props.tokens}
@@ -42,6 +49,7 @@ function TokenField(props: ITokenFieldProps) {
         <SwapField
             value={props.value}
             price={props.price}
+            change={props.change}
             readonly={props.readonly}
             tokens={props.tokens}
             selectToken={props.selectToken}
@@ -65,6 +73,7 @@ export function SendTokenField(props: ISwapFieldProps) {
     return <TokenField
         label={LabelNode}
         value={props.value}
+        change={props.change}
         price={props.price}
         readonly={props.readonly}
         tokens={props.tokens}
