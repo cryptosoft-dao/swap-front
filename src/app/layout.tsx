@@ -5,6 +5,7 @@ import { TelegramProvider } from "@/context/TelegramProvider";
 
 import "./fonts.css";
 import "./globals.css";
+
 import { PageWrapper } from "@/components/wrapper";
 
 const manifestUrl =

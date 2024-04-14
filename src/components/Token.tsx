@@ -1,7 +1,7 @@
 import Image, { StaticImageData } from "next/image";
 import { Box, Flex } from "@/components/wrapper";
 
-import ArrowRightIcon from "@/assets/icons/RightArrow.svg";
+import ArrowRightIcon from "@/assets/icons/right-arrow.svg";
 
 import { IToken } from "@/interfaces/interface";
 
@@ -15,11 +15,11 @@ function TokenIcon(props: { icon: StaticImageData; name: string; }) {
 }
 
 function TokenName(props: { name: string }) {
-    return <span className="text_14_500_SFText text-white leading-none my-auto">{props.name}</span>
+    return <span className="text_14_400_SFText text-white leading-none my-auto">{props.name}</span>
 }
 
 export function SuggestedToken(props: ITokenProps) {
-    return <Box className="flex py-2 cursor-pointer" click={props.select}>
+    return <Box className="!w-fit flex p-2 cursor-pointer" click={props.select}>
         <Flex className="!w-fit m-auto gap-2">
             <TokenIcon icon={props.token.icon} name={props.token.name} />
             <TokenName name={props.token.name} />

@@ -36,33 +36,28 @@ body {
     font-family: "InterMedium";
   }
 
-  .text_12_500_SFText {
+  .text_12_400_SFText {
     font-size: 12px;
-    font-family: 500;
-    font-family: "SFProTextMedium";
+    font-family: "SFProText";
   }
 
   .text_12_500_SFText {
-    font-size: 14px;
-    font-weight: 500;
+    font-size: 12px;
     font-family: "SFProTextMedium";
   }
 
   .text_14_400_SFText {
     font-size: 14px;
-    font-weight: 500;
-    font-family: "SFProTextMedium";
+    font-family: "SFProText";
   }
 
   .text_14_500_SFText {
     font-size: 14px;
-    font-weight: 500;
     font-family: "SFProTextMedium";
   }
 
   .text_15_400_SFText {
     font-size: 15px;
-    font-family: 400;
     font-family: "SFProText";
   }
 
@@ -88,7 +83,6 @@ body {
 
   .text_14_600_SFDisplay {
     font-size: 14px;
-    font-weight: 600;
     font-family: "SFProDisplaySemibold";
   }
 
