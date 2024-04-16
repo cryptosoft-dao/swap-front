@@ -26,6 +26,10 @@ body {
     margin: 0;
   }
 
+  *::-webkit-scrollbar {
+    display: none;
+  }
+
   .text_14_400_Inter {
     font-size: 14px;
     font-family: "Inter";

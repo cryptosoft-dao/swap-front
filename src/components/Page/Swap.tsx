@@ -89,7 +89,7 @@ export default function Home() {
                     <Image src={DownIcon} alt="arrow-down" className="my-auto" />
                 </Flex>
                 {
-                    <Grid className={`gap-3 my-6 ${show ? 'h-auto' : 'h-0'} overflow-hidden`}>
+                    <Grid className={`gap-5 my-6 ${show ? 'h-auto' : 'h-0'} overflow-hidden`}>
                         <List name="Price" value="1 TON ≈ 2,20 USDT" />
                         <List name="Price impact" icon={InfoIcon} value="-1.31%" valueClassName="!text-red" click={() => setModal('info')} />
                         <List name="Minimum received" icon={InfoIcon} value="~ 5 USDT" />

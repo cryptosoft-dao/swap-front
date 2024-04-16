@@ -33,7 +33,7 @@ function Search(props: ISearchProps) {
         return false;
     }
 
-    return <Flex className={`flex-col bg-primary absolute top-0 left-0 p-5 h-full max-w-[480px] ${props.className}`}>
+    return <Flex className={`flex-col bg-primary absolute top-0 left-0 p-6 h-full max-w-[480px] ${props.className}`}>
         <Grid className="gap-3">
             <SearchInput value={search} handleSearch={(newValue) => setSearch(newValue)} />
             <Flex className="gap-2 flex-wrap">
