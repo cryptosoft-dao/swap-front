@@ -5,7 +5,6 @@ export interface IContent<Type> {
   loading: boolean;
   content: Type;
   message: string;
-  progress: number;
 }
 
 export interface IToken {

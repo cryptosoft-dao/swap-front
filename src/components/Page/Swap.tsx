@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import Image, { StaticImageData } from "next/image";
 
 import { Flex, Grid } from "@/components/wrapper";
@@ -19,6 +19,9 @@ import InfoIcon from "@/assets/icons/info.svg";
 import { tokens } from "@/utils/tokens";
 
 import { IToken } from "@/interfaces/interface";
+import { useTonConnect } from "@/hooks/useTONConnect";
+import { getBalance } from "@/services/account";
+import useBalance from "@/hooks/useBalance";
 
 interface INavProps {
     icon: StaticImageData;
@@ -37,13 +40,21 @@ function Nav(props: INavProps) {
 
 export default function Home() {
 
-    const [show, setShow] = useState(false);
-    const [connected, setConnected] = useState(false);
-    const [modal, setModal] = useState("");
+    const { connected, connect, rawWalletAddress } = useTonConnect();
+    const { balance, loadBalance } = useBalance();
 
     const [sendAmount, setSendAmount] = useState(0);
     const [sendToken, setSendToken] = useState<IToken>(tokens[0]);
     const [receiveToken, setReceiveToken] = useState<IToken>(tokens[1]);
+
+    const [show, setShow] = useState(false);
+    const [modal, setModal] = useState("");
+
+    //Load TON balance
+    useEffect(() => {
+        if (!rawWalletAddress) return;
+        loadBalance(rawWalletAddress);
+    }, [rawWalletAddress])
 
     return (
         <Flex className="flex-col h-full">
@@ -57,7 +68,7 @@ export default function Home() {
             <Grid className="gap-4 mt-8 justify-center">
                 <SendTokenField
                     value={sendAmount}
-                    price={sendAmount * 2.1}
+                    price={balance.content}
                     change={(value) => setSendAmount(value)}
                     tokens={tokens}
                     selectedToken={sendToken}
@@ -80,7 +91,7 @@ export default function Home() {
                 click={() => setModal("progress")}
             /> : <PrimaryButton
                 name={sendAmount && !connected ? "Connect & Swap" : "Connect"}
-                click={() => setConnected(true)}
+                click={connect}
                 className="my-4"
             />}
             <div className="mb-5">

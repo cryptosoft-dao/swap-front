@@ -26,8 +26,8 @@ export async function get<T>(option: IRequestProps): Promise<IResponse<T>> {
     };
   } catch (err: any) {
     let message = (err as Error).message;
-    if (err.res?.data) {
-      message = err.res.data.message;
+    if (err.res?.error) {
+      message = err.res.error;
     }
     return {
       status: "fail",
