@@ -1,6 +1,9 @@
 "use client";
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Image, { StaticImageData } from "next/image";
+
+import { useTonConnect } from "@/hooks/useTONConnect";
+import { useAccount } from "@/context/AccountProvider";
 
 import { Flex, Grid } from "@/components/wrapper";
 import { ReceiveTokenField, SendTokenField } from "@/components/Form/SwapInput";
@@ -16,12 +19,7 @@ import SwapIcon from "@/assets/icons/swapicon.svg";
 import DownIcon from "@/assets/icons/down-icon.svg";
 import InfoIcon from "@/assets/icons/info.svg";
 
-import { tokens } from "@/utils/tokens";
-
 import { IToken } from "@/interfaces/interface";
-import { useTonConnect } from "@/hooks/useTONConnect";
-import { getBalance } from "@/services/account";
-import useBalance from "@/hooks/useBalance";
 
 interface INavProps {
     icon: StaticImageData;
@@ -40,21 +38,15 @@ function Nav(props: INavProps) {
 
 export default function Home() {
 
-    const { connected, connect, rawWalletAddress } = useTonConnect();
-    const { balance, loadBalance } = useBalance();
+    const { connected, connect } = useTonConnect();
+    const account = useAccount();
 
     const [sendAmount, setSendAmount] = useState(0);
-    const [sendToken, setSendToken] = useState<IToken>(tokens[0]);
-    const [receiveToken, setReceiveToken] = useState<IToken>(tokens[1]);
+    const [sendToken, setSendToken] = useState<IToken>(account.tokens[0]);
+    const [receiveToken, setReceiveToken] = useState<IToken>(account.tokens[1]);
 
     const [show, setShow] = useState(false);
     const [modal, setModal] = useState("");
-
-    //Load TON balance
-    useEffect(() => {
-        if (!rawWalletAddress) return;
-        loadBalance(rawWalletAddress);
-    }, [rawWalletAddress])
 
     return (
         <Flex className="flex-col h-full">
@@ -68,27 +60,27 @@ export default function Home() {
             <Grid className="gap-4 mt-8 justify-center">
                 <SendTokenField
                     value={sendAmount}
-                    price={balance.content}
+                    balance={sendToken.balance}
                     change={(value) => setSendAmount(value)}
-                    tokens={tokens}
+                    tokens={account.tokens}
                     selectedToken={sendToken}
                     selectToken={(token) => setSendToken(token)}
                 />
                 <Image src={SwapIcon} alt="swap" className="w-[15px] h-[15px] mx-auto" />
                 <ReceiveTokenField
                     value={Number.parseFloat((sendAmount * 2.24).toFixed(2))}
-                    price={sendAmount * 2.24 * 2.1}
-                    readonly={true}
-                    tokens={tokens}
+                    balance={sendAmount * 2.24 * 2.1}
+                    tokens={account.tokens}
                     selectedToken={receiveToken}
                     selectToken={(token) => setReceiveToken(token)}
-                    error="No liquidity"
+                    readonly={true}
                 />
             </Grid>
             {connected ? <PrimaryButton
                 name="Swap"
                 className="my-4"
                 click={() => setModal("progress")}
+                disabled={account.loading}
             /> : <PrimaryButton
                 name={sendAmount && !connected ? "Connect & Swap" : "Connect"}
                 click={connect}

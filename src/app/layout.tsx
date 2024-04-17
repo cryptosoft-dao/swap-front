@@ -1,7 +1,8 @@
 "use client"
 
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
-import { TelegramProvider } from "@/context/TelegramProvider";
+import { TelegramProvider } from "@/context/TelegramProvider"
+import { AccountProvider } from "@/context/AccountProvider";
 
 import "./fonts.css";
 import "./globals.css";
@@ -22,9 +23,11 @@ export default function RootLayout({
       <body>
         <TelegramProvider>
           <TonConnectUIProvider manifestUrl={manifestUrl}>
-            <PageWrapper>
-              {children}
-            </PageWrapper>
+            <AccountProvider>
+              <PageWrapper>
+                {children}
+              </PageWrapper>
+            </AccountProvider>
           </TonConnectUIProvider>
         </TelegramProvider>
       </body>

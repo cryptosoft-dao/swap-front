@@ -42,7 +42,7 @@ export function useTonConnect(): {
         connected: tonConnectUI?.connected,
         connectionChecked: connectionRestored,
         network: wallet?.account?.chain || null,
-        rawWalletAddress: wallet?.account?.address || null,
+        rawWalletAddress:wallet?.account?.address || null,
         walletAddress: wallet
             ? toUserFriendlyAddress(wallet.account.address)
             : null

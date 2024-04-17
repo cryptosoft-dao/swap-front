@@ -7,7 +7,7 @@ import { IToken } from "@/interfaces/interface";
 
 interface ITokenProps {
     token: IToken;
-    select:() => void;
+    select: () => void;
 }
 
 function TokenIcon(props: { icon: StaticImageData; name: string; }) {
@@ -34,7 +34,7 @@ export function ListToken(props: ITokenProps) {
             <TokenName name={props.token.name} />
         </Flex>
         <Flex className="!w-fit gap-2">
-            <span className="text_14_400_SFText leading-none text-text_primary my-auto">{props.token.balance}{" "}{props.token.name}</span>
+            <span className={`text_14_400_SFText leading-none text-text_primary my-auto ${props.token.balance ? "" : "hidden"}`}>{props.token.balance}{" "}{props.token.name}</span>
             <Image className="my-auto" src={ArrowRightIcon} alt={"arrow-right"} />
         </Flex>
     </Flex>

@@ -9,27 +9,38 @@ import ScaleIcon from "@/assets/icons/SCALE.svg";
 export const tokens: IToken[] = [
   {
     name: "TON",
+    symbol: "TON",
     icon: TONIcon,
-    balance: 640,
+    balance: 0,
+    address: "",
+    native: true,
   },
   {
     name: "USDT",
+    symbol: "jUSDT",
     icon: USDTIcon,
-    balance: 156.3,
+    balance: 0,
+    address: "",
   },
   {
-    name:"SCALE",
-    icon:ScaleIcon,
-    balance:3000.34
+    name: "SCALE",
+    symbol: "SCALE",
+    icon: ScaleIcon,
+    balance: 0,
+    address: "",
   },
   {
     name: "oUSDC",
+    symbol: "oUSDC",
     icon: USDCIcon,
-    balance: 342.234,
+    balance: 0,
+    address: "",
   },
   {
     name: "NFZ",
+    symbol: "NFZ",
     icon: NFZIcon,
-    balance: 2343.234,
-  }
+    balance: 0,
+    address: "",
+  },
 ];

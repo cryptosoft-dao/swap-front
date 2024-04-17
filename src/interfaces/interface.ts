@@ -9,6 +9,9 @@ export interface IContent<Type> {
 
 export interface IToken {
   name: string;
+  symbol: string;
   icon: StaticImageData;
   balance: number;
+  address: string;
+  native?: boolean;
 }

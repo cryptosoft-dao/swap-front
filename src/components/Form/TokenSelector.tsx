@@ -1,12 +1,13 @@
 import { useState } from "react";
 import Image from "next/image";
 
+import { useAccount } from "@/context/AccountProvider";
+
 import { Flex, Grid } from "@/components/wrapper";
 import SearchInput from "@/components/Form/SearchInput";
 import { SuggestedToken, ListToken } from "@/components/Token";
 import Footer from "@/components/Footer";
 
-import { tokens } from "@/utils/tokens";
 import ArrowUp from "@/assets/icons/down-icon.svg";
 
 import { IToken } from "@/interfaces/interface";
@@ -25,12 +26,14 @@ interface ISearchProps {
 
 function Search(props: ISearchProps) {
 
+    const { tokens } = useAccount();
     const [search, setSearch] = useState("");
 
     function filter(token: IToken) {
         if (!search) return true;
-        if (search.toLocaleLowerCase() === token.name.toLocaleLowerCase()) return true;
-        return false;
+        const byname = search.toLocaleLowerCase() === token.name.toLocaleLowerCase();
+        const byaddress = search.toLocaleLowerCase() === token.address.toLocaleLowerCase();
+        return byname || byaddress;
     }
 
     return <Flex className={`flex-col bg-primary absolute top-0 left-0 p-6 h-full max-w-[480px] ${props.className}`}>

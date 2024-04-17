@@ -4,7 +4,7 @@ import { IToken } from "@/interfaces/interface";
 
 interface ISwapFieldProps {
     value: number;
-    price: number;
+    balance: number;
     change?: (value: number) => void;
     readonly?: boolean;
     tokens: IToken[];
@@ -47,7 +47,7 @@ function TokenField(props: ITokenFieldProps) {
             {props.label}
             <SwapField
                 value={props.value}
-                price={props.price}
+                balance={props.balance}
                 change={props.change}
                 readonly={props.readonly}
                 tokens={props.tokens}
@@ -64,8 +64,8 @@ export function SendTokenField(props: ISwapFieldProps) {
 
     const LabelNode = <div className="flex justify-between">
         <Label label="You Send" />
-        {props.price ? <div className="flex gap-1">
-            <Label label={`${props.price} ${props.selectedToken.name}`} />
+        {props.balance ? <div className="flex gap-1">
+            <Label label={`${props.balance} ${props.selectedToken.name}`} />
             <Label label="MAX" className={"!text-blue"} />
         </div>:<></>}
     </div>;
@@ -74,7 +74,7 @@ export function SendTokenField(props: ISwapFieldProps) {
         label={LabelNode}
         value={props.value}
         change={props.change}
-        price={props.price}
+        balance={props.balance}
         readonly={props.readonly}
         tokens={props.tokens}
         selectToken={props.selectToken}
@@ -86,13 +86,13 @@ export function SendTokenField(props: ISwapFieldProps) {
 export function ReceiveTokenField(props: ISwapFieldProps) {
     const LabelNode = <div className="flex justify-between">
         <Label label="You Recieve" />
-        <Label label={props.price ? `${props.price} ${props.selectedToken.name}` : ''} />
+        <Label label={props.balance ? `${props.balance} ${props.selectedToken.name}` : ''} />
     </div>;
 
     return <TokenField
         label={LabelNode}
         value={props.value}
-        price={props.price}
+        balance={props.balance}
         readonly={props.readonly}
         tokens={props.tokens}
         selectToken={props.selectToken}

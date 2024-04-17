@@ -8,3 +8,7 @@ export interface IResponse<T> {
   data: T | null;
   message: string;
 }
+
+export interface IBalancesRes<T> {
+  balances: T;
+}
