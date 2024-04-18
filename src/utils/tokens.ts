@@ -1,12 +1,10 @@
-import { IToken } from "@/interfaces/interface";
-
 import USDTIcon from "@/assets/icons/USDT.svg";
 import USDCIcon from "@/assets/icons/USDC.svg";
 import TONIcon from "@/assets/icons/TON.svg";
 import NFZIcon from "@/assets/icons/NFZ.svg";
 import ScaleIcon from "@/assets/icons/SCALE.svg";
 
-export const tokens: IToken[] = [
+export const tokens = [
   {
     name: "TON",
     symbol: "TON",

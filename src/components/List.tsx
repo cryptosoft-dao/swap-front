@@ -1,5 +1,5 @@
 import Image, { StaticImageData } from "next/image";
-import { Grid, Flex } from "./wrapper";
+import { Flex } from "./wrapper";
 
 interface ILabelProps {
     name: string;

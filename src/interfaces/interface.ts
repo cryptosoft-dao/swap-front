@@ -8,10 +8,16 @@ export interface IContent<Type> {
 }
 
 export interface IToken {
+  type: string;
+  address?: string;
   name: string;
   symbol: string;
-  icon: StaticImageData;
+  image: string;
+  decimals: number;
   balance: number;
-  address: string;
-  native?: boolean;
+}
+
+export interface ISlippage {
+  value: number;
+  type: "custom" | "default";
 }

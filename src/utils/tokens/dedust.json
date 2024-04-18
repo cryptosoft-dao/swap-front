@@ -1,0 +1,1173 @@
+{
+  "assets": [
+    {
+      "type": "native",
+      "name": "Toncoin",
+      "symbol": "TON",
+      "image": "ton.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBlqsm144Dq6SjbPI4jjZvA1hqTIP3CvHovbIfW_t-SCALE",
+      "name": "Scaleton",
+      "symbol": "SCALE",
+      "image": "scale.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBynBO23ywHy_CgarY9NK9FTz0yDsG82PtcbSTQgGoXwiuA",
+      "name": "TON Bridge USDT",
+      "symbol": "jUSDT",
+      "image": "usdt.png",
+      "decimals": 6,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAQXlWJvGbbFfE8F3oS8s87lIgdovS455IsWFaRdmJetTon",
+      "name": "JetTon",
+      "symbol": "JETTON",
+      "image": "jetton.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQB-MPwrd1G6WKNkLz_VnV6WqBDd142KMQv-g1O-8QUA3728",
+      "name": "TON Bridge USDC",
+      "symbol": "jUSDC",
+      "image": "usdc.png",
+      "decimals": 6,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDcBkGHmC4pTf34x3Gm05XvepO5w60DNxZ-XT4I6-UGG5L5",
+      "name": "TON Bridge WBTC",
+      "symbol": "jWBTC",
+      "image": "wbtc.png",
+      "decimals": 8,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDo_ZJyQ_YqBzBwbVpMmhbhIddKtRP99HugZJ14aFscxi7B",
+      "name": "TON Bridge DAI",
+      "symbol": "jDAI",
+      "image": "dai.png",
+      "decimals": 18,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQC_1YoM8RBixN95lz7odcF3Vrkc_N8Ne7gQi7Abtlet_Efi",
+      "name": "Orbit Bridge USDT",
+      "symbol": "oUSDT",
+      "image": "orbit-usdt.png",
+      "decimals": 6,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQC61IQRl0_la95t27xhIpjxZt32vl1QQVF2UgTNuvD18W-4",
+      "name": "Orbit Bridge USDC",
+      "symbol": "oUSDC",
+      "image": "orbit-usdc.png",
+      "decimals": 6,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQANasbzD5wdVx0qikebkchrH64zNgsB38oC9PVu7rG16qNB",
+      "name": "Orbit Bridge WBTC",
+      "symbol": "oWBTC",
+      "image": "orbit-wbtc.png",
+      "decimals": 8,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAAXwH0cajPsMF-nNC5kz-SaLaeaDr4M7Q1foVwP_vOW1tR",
+      "name": "Orbit Bridge DAI",
+      "symbol": "oDAI",
+      "image": "orbit-dai.png",
+      "decimals": 18,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDNhy-nxYFgUqzfUzImBEP67JqsyMIcyk2S5_RwNNEYku0k",
+      "name": "Staked TON by bemo",
+      "symbol": "stTON",
+      "image": "stton-bemo.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQB0SoxuGDx5qjVt0P_bPICFeWdFLBmVopHhjgfs0q-wsTON",
+      "name": "Ton Whales liquid staking token",
+      "symbol": "wsTON",
+      "image": "wston-whales.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCcLAW537KnRg_aSPrnQJoyYjOZkzqYp6FVmRUvN1crSazV",
+      "name": "Ambra",
+      "symbol": "AMBR",
+      "image": "ambr.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCBdxpECfEPH2wUxi1a6QiOkSf-5qDjUWqLCUuKtD-GLINT",
+      "name": "Glint Coin",
+      "symbol": "GLINT",
+      "image": "glint.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCJbp0kBpPwPoBG-U5C-cWfP_jnksvotGfArPF50Q9Qiv9h",
+      "name": "Ton Raffles Token",
+      "symbol": "RAFF",
+      "image": "raff.webp",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQD0vdSA_NedR9uvbgN9EikRX-suesDxGeFg69XQMavfLqIw",
+      "name": "Bolt",
+      "symbol": "BOLT",
+      "image": "bolt.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBjEw-SOe8yV2kIbGVZGrsPpLTaaoAOE87CGXI2ca4XdzXA",
+      "name": "Margaritis",
+      "symbol": "MARGA",
+      "image": "marga.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCbKMTmEAdSnzsK85LOpaDkDH3HjujEbTePMSeirvEaNq-U",
+      "name": "Magic Crystal",
+      "symbol": "MC",
+      "image": "mc.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQC-tdRjjoYMz3MXKW4pj95bNZgvRyWwZ23Jix3ph7guvHxJ",
+      "name": "KINGYTON",
+      "symbol": "KINGY",
+      "image": "kingy.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQB-ajMyi5-WKIgOHnbOGApfckUGbl6tDk3Qt8PKmb-xLAvp",
+      "name": "TonexCoin",
+      "symbol": "TNX",
+      "image": "tnx.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCQZpelevHNsbw5IUtwSa4Cs8kqWww0KsYeDri9kwS18eCz",
+      "name": "DYOR Coin",
+      "symbol": "DYOR",
+      "image": "dyor.png",
+      "decimals": 15,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBJOJ2eL_CUFT_0r9meoqjKUwRttC_-NUJyvWQxszVWe1WY",
+      "name": "Petcoin",
+      "symbol": "PET",
+      "image": "pet.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDNDv54v_TEU5t26rFykylsdPQsv5nsSZaH_v7JSJPtMitv",
+      "name": "Tonnel Network Token",
+      "symbol": "TONNEL",
+      "image": "tonnel.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQD_KpO2-iFeHPT4dF0ur9E0iAFts2fwhpR2KjwAmYKpccvH",
+      "name": "ЖЮ",
+      "symbol": "LIFEYT",
+      "image": "lifeyt.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAM2KWDp9lN0YvxvfSbI0ryjBXwM70rakpNIHbuETatRWA1",
+      "name": "ARBUZ",
+      "symbol": "ARBUZ",
+      "image": "arbuz.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCu9qafFYH1tbvBCsVg6QQwPbLinzQ27HKkr0Tb4WSobXI-",
+      "name": "MONK",
+      "symbol": "MONK",
+      "image": "monk.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCvaf0JMrv6BOvPpAgee08uQM_uRpUd__fhA7Nm8twzvbE_",
+      "name": "TonUP",
+      "symbol": "UP",
+      "image": "up.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBk0iOnG6u4yVzf4HfZf7EGuetWiKbyR5GApBgblmeG-jPL",
+      "name": "RED X",
+      "symbol": "REDX",
+      "image": "redx.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQD0nt2W1YwJFdMQ-GIx4jguNbvbjS-aM32jOW7hTQs58lds",
+      "name": "Grabscape governance token",
+      "symbol": "GGT",
+      "image": "ggt.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCW5g1evnQN2OZZEVe-23aSvEsgPauWZlF27ZIz5REhnWRy",
+      "name": "DEFI HUNTERS DAO",
+      "symbol": "DDAO",
+      "image": "ddao.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQC-A0ZHiAliPJ6LYQQZ6x2WRJC0aHEmJ_OMG6pidb5ASpIY",
+      "name": "EXTON COIN",
+      "symbol": "EXC",
+      "image": "exc.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBCFwW8uFUh-amdRmNY9NyeDEaeDYXd9ggJGsicpqVcHq7B",
+      "name": "DHD Coin",
+      "symbol": "DHD",
+      "image": "dhd.jpg",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBj7uoIVsngmS-ayOz1nHENjZkjTt5mXB4uGa83hmcqq2wA",
+      "name": "Grabscape game token",
+      "symbol": "GRBS",
+      "image": "grbs.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBiJ8dSbp3_YAb_KuC64zCrFqQTsFbUee5tbzr5el_HEDGE",
+      "name": "HEDGE coin",
+      "symbol": "HEDGE",
+      "image": "hedge.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAvvEdq4x5K6owjsMI4X6AxKkTBXVKIVkiSHDLt6i2LFnnQ",
+      "name": "Bear Country Token",
+      "symbol": "JBCT",
+      "image": "jbct.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBtFN8h8dStTvI58tESc_S70ehkBLSuzQqCg5BLIQyKMBC1",
+      "name": "VOMER",
+      "symbol": "VMR",
+      "image": "vmr.webp",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBl3gg6AAdjgjO2ZoNU5Q5EzUIl8XMNZrix8Z5dJmkHUfxI",
+      "name": "Lavandos",
+      "symbol": "LAVE",
+      "image": "lave.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCPmOnkTe8qP_ZtCf3Rys04ukRTiQc_xVS-lGQ6BH3JZWmC",
+      "name": "Tenere",
+      "symbol": "TNR",
+      "image": "tnr.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAj18Ki4sG47AXb14No35FnrMNBxC2uHcuIejJDyrd6VXpQ",
+      "name": "PAPA CARLO",
+      "symbol": "PC",
+      "image": "pc.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBtUKPbhABPYtltiKWA547s4ZhJ5wZHvVV1eyfV7sEyGs2J",
+      "name": "Wallet Exchanger",
+      "symbol": "WEX",
+      "image": "wex.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBzyesZ3p1WGNrggNSJi6JFK3vr0GhqJp4gxker9oujjcuv",
+      "name": "TonTake",
+      "symbol": "TAKE",
+      "image": "take.jpeg",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCfJ4Su11h0_MB2XRvIjm8gw0y2AB4RZEfOoPOweyVIzvda",
+      "name": "Milyman",
+      "symbol": "MILY",
+      "image": "mily.jpg",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDqQscohYilSqWEyeLyCReOQKOh7KhRX_CPlD-Qdx02tUbG",
+      "name": "Vincere",
+      "symbol": "VC",
+      "image": "vincere.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQACGPrFHWCy9QmeFXPqvZflyoeBb5grVQxAaucF0hNd1sEs",
+      "name": "Stalin",
+      "symbol": "IVS",
+      "image": "ivs.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAYBDuLdLrjDKR1SUZ60ZuLuSzHDIoE26zZExuB_bjiG0Zr",
+      "name": "TON Click",
+      "symbol": "CLICK",
+      "image": "click.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDCAjHxgyScUPS-Am_2nAH7C5XWM4fc2X9dVyWpFgHXG2rT",
+      "name": "EggsWisdom",
+      "symbol": "EGG",
+      "image": "egg.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAS2elYb6_hqWyOl7gpuYTzf1sqmjLJQ0lQ4X_4d_MvtMWR",
+      "name": "Love You",
+      "symbol": "LOVE",
+      "image": "love.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQD26zcd6Cqpz7WyLKVH8x_cD6D7tBrom6hKcycv8L8hV0GP",
+      "name": "DeFinder Capital",
+      "symbol": "DFC",
+      "image": "dfc.jpeg",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAhRC_oZ4B9VgMltfNkENSdLktlMADPE73zIiIcL6es2o7-",
+      "name": "TON Drift",
+      "symbol": "DRIFT",
+      "image": "drift.png",
+      "decimals": 10,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCyDhcASwIm8-eVVTzMEESYAeQ7ettasfuGXUG1tkDwVJbc",
+      "name": "Lucky TON",
+      "symbol": "LKY",
+      "image": "lucky.jpeg",
+      "decimals": 8,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQA2IyKaO7fKV37GxQGbRY_yZdE47ZdQXbOnX55OWhCwbL6H",
+      "name": "GROK",
+      "symbol": "GROK",
+      "image": "grok.jpeg",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQATcUc69sGSCCMSadsVUKdGwM1BMKS-HKCWGPk60xZGgwsK",
+      "name": "TON FISH MEMECOIN",
+      "symbol": "FISH",
+      "image": "fish.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDODkpfxZ4joe3RxBckjgvCCQH-TXxozbNwTOoCUoOMCfX8",
+      "name": "GRIMACE COIN",
+      "symbol": "GRIMACE",
+      "image": "grimace.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCYlvFpi04AFebeF0x4KayKioExdvP23iwtTJ45GaaTTEbP",
+      "name": "PAPA",
+      "symbol": "PAPA",
+      "image": "papa.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDgHOW0gbfEodDilc8Vkms_FzahCxhXos7GwJXXhz8uwPET",
+      "name": "Wrapped Ymakanic Coin",
+      "symbol": "wYKC",
+      "image": "wykc.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAtwmCISetV3ncZRb1QDiHcbSgfo-Y37-zPL6NhedGHGaTf",
+      "name": "SEED",
+      "symbol": "SEED",
+      "image": "seed.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBiHSLVzoicc-LQPDXJc_rF-WRft0aFihccFduA6fQ1ynYM",
+      "name": "Baron",
+      "symbol": "BARO",
+      "image": "baro.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCyfdVbfwkcBfBSn57GRnMY_BRO4vYG7HnkWngH41FLM-5Y",
+      "name": "Making Money TON",
+      "symbol": "MMT",
+      "image": "mmt.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCMDE8Ffe-40QGryoSyazN_YlCHr-Hp_oc3-duz2GsaW-_w",
+      "name": "TON GAIKA",
+      "symbol": "GAIKA",
+      "image": "gaika.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQC4D-qkAaqYXWOnWRJx6xtOhd7Fa9zZQdob8iWD6mS_kPqU",
+      "name": "TONic",
+      "symbol": "TONIC",
+      "image": "tonic.png",
+      "decimals": 18,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQC_kG29HfgpJRW2RYIApeQI9PPYdzdsleqiarfo00MvSTSs",
+      "name": "Meow",
+      "symbol": "MEOW",
+      "image": "meow.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAcjv-v76upZgRoRNUM6tCmd6d9Q09sWVTFqCdfLeuP4P3b",
+      "name": "TonTogether",
+      "symbol": "TOT",
+      "image": "tot.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAjjnIVdwE6J0zgDXiXgOU5odFAvDE4iKvYDZx95wK17a8F",
+      "name": "butTON",
+      "symbol": "BTON",
+      "image": "bton.webp",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAJ29WkjjLqu-ucmAj9A0rRm86U6OvNRz46iqd1XVy8Pryq",
+      "name": "Lombard Revival Token",
+      "symbol": "LRT",
+      "image": "lrt.jpeg",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBBjMB-epcdooV0LKSAOl12see94OnllUWFXi0mqYZGsXr2",
+      "name": "SIMBA",
+      "symbol": "SIM",
+      "image": "sim.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDgyXtVBaUTYrNIYEyVTOIUCWItOPlj5eViJH7URrFI8DDR",
+      "name": "BANANA",
+      "symbol": "BANANA",
+      "image": "banana.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBE_P2bKO9dHGSwUhZbQv6va-YRuEWUEZuCv_iEXgO-psTz",
+      "name": "Dracoin",
+      "symbol": "DRA",
+      "image": "dra.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDf84FT8tdHZeI2-LXdb8gPMRqHRSABrmi8jI7MzvVpGJKZ",
+      "name": "OpenCoin",
+      "symbol": "OPEN",
+      "image": "open.png",
+      "decimals": 5,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQADvGUQtbwXCgYU-0Ug4rGkwTpZr6Iyzikp6qMBpYE2HXFq",
+      "name": "Mercury coin",
+      "symbol": "MERC",
+      "image": "merc.png",
+      "decimals": 7,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDpnjfEwSJjdUufatHdopE9sZLKmD7ngXJvbixkel6zta5B",
+      "name": "Chad on TON",
+      "symbol": "CHAD",
+      "image": "chad.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQD5ty5IxV3HECEY1bbbdd7rNNY-ZcA-pAIGQXyyRZRED9v3",
+      "name": "Stable Metal",
+      "symbol": "STBL",
+      "image": "stbl.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAO3n9xmdXwXHUhtZ3zKexpeUEKejYVKCeEupdsg2kvgcof",
+      "name": "ToonTools",
+      "symbol": "TOON",
+      "image": "toon.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQB9D1_Rog6itYuNoLkIUmsjmkF7hU_UUSzFkEwiv6ZseCac",
+      "name": "MAMA",
+      "symbol": "MAMA",
+      "image": "mama.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQD39LNnyg6uEQv5jqkF76F45VY4sszDqqz2N8KbL1QQ3XPr",
+      "name": "BARASH",
+      "symbol": "SHEEP",
+      "image": "sheep.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBlHnYC0Uk13_WBK4PN-qjB2TiiXixYDTe7EjX17-IV-0eF",
+      "name": "Ton Invaders Coin",
+      "symbol": "INC",
+      "image": "inc.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAVluGRC4wEV2aDpiIgqiEvhnH--lmq5EFaL6C9Vfv0VRMZ",
+      "name": "Fake Notcoin",
+      "symbol": "FNOT",
+      "image": "fnot.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBmcXCytc9ZDcyfoh9FXNNvSkpsl_VD7GwjkhBU1hF1S_dw",
+      "name": "DOBERCOIN",
+      "symbol": "DOBER",
+      "image": "dober.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCDIJKFTf5QoWii6-_KTk8bo6eKiR-6hk5HUQwixCe8SW-I",
+      "name": "VISHNYA",
+      "symbol": "VISHNYA",
+      "image": "vishnya.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCA4a0fi5CCkKowfZVASYOcaz9nJhhWI7DijU2vsohyMGNn",
+      "name": "JogjaTON",
+      "symbol": "JOG",
+      "image": "jog.jpeg",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQC47093oX5Xhb0xuk2lCr2RhS8rj-vul61u4W2UH5ORmG_O",
+      "name": "Gram",
+      "symbol": "GRAM",
+      "image": "gram.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCsN1IslttnFpGjUabpt3RCnVYca74ZB9yD0L2ZK9CvJ53D",
+      "name": "Ferma Invest Dom",
+      "symbol": "FID",
+      "image": "fid.jpeg",
+      "decimals": 3,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBfX9KO5yIFprHWPpJp3OsX-6cjLjEJF-h5uIQE3eLJY8_h",
+      "name": "Virtuals Worlds",
+      "symbol": "VWS",
+      "image": "vws.png",
+      "decimals": 18,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQA1jvPqRx6bujYohDny43hwX8FZr3b6OYnI3t2jHd4TXSJs",
+      "name": "TON SHIP",
+      "symbol": "SHIP",
+      "image": "ship.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCweXSZaX5k5xOtXLbGgfF8FY6Dbg6rNiPrd9d0f_-kDSHZ",
+      "name": "RubeTON",
+      "symbol": "RUBETON",
+      "image": "rubeton.jpeg",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBtcL4JA-PdPiUkB8utHcqdaftmUSTqdL8Z1EeXePLti_nK",
+      "name": "Web3 TON Token",
+      "symbol": "WEB3",
+      "image": "web3.png",
+      "decimals": 3,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCymLRXp1QYxZKek4CTInckB1ey5TkyAJQpPAlNetiO54Vt",
+      "name": "Meridian",
+      "symbol": "MRDN",
+      "image": "mrdn.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQD3U8yc2moTe8yCbUlYxkMh_SCCWLkuxQam2lab4iDfpXYU",
+      "name": "Secure Sockets Layer",
+      "symbol": "SSL",
+      "image": "ssl.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBHcVEoIwZ22GifL7BtVTGkzJKLQoC-rmqV6_nj7SR-hL2P",
+      "name": "Jason Statham",
+      "symbol": "STATHAM",
+      "image": "statham.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQC8FoZMlBcZhZ6Pr9sHGyHzkFv9y2B5X9tN61RvucLRzFZz",
+      "name": "JVault Token",
+      "symbol": "JVT",
+      "image": "jvt.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDmgVHxf-avCIDyU3POfqzXsyU9FzAOdJGVAY-arolFtb7B",
+      "name": "TonEnd",
+      "symbol": "END",
+      "image": "end.jpeg",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDNlNA2NSbWtigW37WX__FIu4Y2NNPwijJd3Ktmhi7gdCyv",
+      "name": "E4",
+      "symbol": "E4",
+      "image": "e4.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDnNof1yihA_JtXc70AZJCgw5_b1hIKkJGcdBXS5K-p3S-_",
+      "name": "Tonbet Token",
+      "symbol": "TBT",
+      "image": "tonbet.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBT2Ee4Lx5w9uI7oMly5upXNs3ABWL_Fwk1uiM74gZCGaYt",
+      "name": "1RUS DAO",
+      "symbol": "1RUSD",
+      "image": "1rus.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDgSR_-4FDlXPfMVefXX1IIXMWBH4YfYV1a_8cJ0XsGVdsf",
+      "name": "PROTON JETTON",
+      "symbol": "PROTON",
+      "image": "proton.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQC52I3c2rmZpUav0LrU6q7wuXoTmhOInvaFhKjZ6QuC5tV5",
+      "name": "SCAM",
+      "symbol": "SCAM",
+      "image": "scam.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAu8oDM_dXMgQd1COjRnU6sYhmvm5RP32gyyL9R2Rv-8s70",
+      "name": "SquirellCoin",
+      "symbol": "SQRL",
+      "image": "sqrl.jpeg",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBLhoan0aTiLK6JTys13c8ZM1qjqpDFOs3UpYQ0B-Kdt3J6",
+      "name": "BRAD",
+      "symbol": "BRAD",
+      "image": "brad.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCXIHAWDAJEJhMiNVqeUvp3I6O7y_P2sD80zEsJXeUi56mb",
+      "name": "Mumba",
+      "symbol": "MUMBA",
+      "image": "mumba.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBfMGkJtSWA4VZspN0zC9iedpK60HwPAIEWaPJaIWgf_pnV",
+      "name": "TON Goblins Token",
+      "symbol": "GOBLIN",
+      "image": "goblin.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCRU1SC3xNf_r33q8NZzLughmvdE21JRYIZj4oRKUdRKRDb",
+      "name": "BEETON",
+      "symbol": "BEE",
+      "image": "bee.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQD4P32U10snNoIavoq6cYPTQR82ewAjO20epigrWRAup54_",
+      "name": "Hydra",
+      "symbol": "HYDRA",
+      "image": "hydra.png",
+      "decimals": 6,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDzvs6ZhNDZMQMeKK2Inc8ymDpORl0H5hAfgtf3dXRbt7I7",
+      "name": "Rug Pull",
+      "symbol": "RUGPULL",
+      "image": "rugpull.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDAiXxX8J2CHo4un2mAYFuexI620Y33CWfLFZK-7LcR9Pps",
+      "name": "Magic Vip People",
+      "symbol": "MVP",
+      "image": "mvp.png",
+      "decimals": 18,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDA6v7olSvZCEr2yNhUlM4eBnRF11lsHLrtkkh7MSMICt4r",
+      "name": "SAFT ENRG",
+      "symbol": "SENRG",
+      "image": "senrg.png",
+      "decimals": 0,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCY8WgTgujVGm83VZyFUuFIXuD9_SAKwGyiJiBuxGq55DGd",
+      "name": "Tilt",
+      "symbol": "TILT",
+      "image": "tilt.jpeg",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQD3zalQrwnhAA5puG-J_tQv3W5n5c6v449jk084Bq4lWuSQ",
+      "name": "Ton Ai",
+      "symbol": "TAI",
+      "image": "tai.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQByLZOaBbpr9EwNonXKEfkkZL1viNsYHezxw5CVK4Bh0zEb",
+      "name": "DINJA",
+      "symbol": "DINJA",
+      "image": "dinja.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDsvbmh_rHjpO-FX3pmtPutllynl0OKuqqR9c1RICibsN6l",
+      "name": "Round Chicken Token",
+      "symbol": "RCT",
+      "image": "rct.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDlnVo-6abJzyHlU8uB7pRjE7OIKt4HTTDPG4hfwOf5jTPg",
+      "name": "ALL",
+      "symbol": "ALL",
+      "image": "all.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAMSx9XLYJ6lYB9LL0kAPjZPhGYdlV7QQsPgRrVGv3qGLNt",
+      "name": "Stec Network",
+      "symbol": "STEC",
+      "image": "stec.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQATgD7dao9jWBdz_qKL-UJZCXZGQvV5HJVUC85ssgmHKWll",
+      "name": "Plankton",
+      "symbol": "PLANKTON",
+      "image": "plankton.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDsrCYtZgbO57PQ47b9oytjQrUjix-gz2wIP088DEUvh2kC",
+      "name": "ARBUZ",
+      "symbol": "jARBUZ",
+      "image": "arbuz.png",
+      "decimals": 18,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBZ_cafPyDr5KUTs0aNxh0ZTDhkpEZONmLJA2SNGlLm4Cko",
+      "name": "Resistance Dog",
+      "symbol": "REDO",
+      "image": "redo.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBhj9Fwtr0ZwftDF13f6d1aqh5Cegdqit8BCTwbjL71KN3Z",
+      "name": "FREEDOM",
+      "symbol": "FREE",
+      "image": "free.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQB2lbt2s_jdUW3OoUIb7-9RoK2UeGXmgC7BnOwgK6P_JTrm",
+      "name": "UNICORN",
+      "symbol": "UNIC",
+      "image": "unic.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCgFCvZCV6qqB-2Kel6D_kV4zEW4FFOQfYV4KDDNTEJdItn",
+      "name": "BORIS PIXEL",
+      "symbol": "PIXEL",
+      "image": "pixel.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCSn3u5g0mGg4eBnP36kauDc9Flt4VphS-0TXz0f60wOqsI",
+      "name": "eNOT COIN",
+      "symbol": "eNOT",
+      "image": "enot.png",
+      "decimals": 5,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCIIUm7dnBgmcrubDfFLZV52oe1F_HFdDZiMfer9riphpQo",
+      "name": "SAKE",
+      "symbol": "SAKE",
+      "image": "sake.webp",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCcXKwYGCCZnzQj9vwwg8Y-F3d8H7cow-Mwgj8pTFruBfP8",
+      "name": "Tribe",
+      "symbol": "TRIBE",
+      "image": "tribe.png",
+      "decimals": 2,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBygwrEcGIj5zmEtWeMGsQXbXr1WBgV3coVfqyURQighw2Y",
+      "name": "NUDES Coin",
+      "symbol": "NUDES",
+      "image": "nudes.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQDoziSttQZ96QJRxHRKdatCm5L9DRL9LKycXcjl8RPXZM0N",
+      "name": "POT",
+      "symbol": "POT",
+      "image": "pot.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCvsARFU_tJCRq7eFTrs2ORasCwDIPLQo7ZlkehsMmgQzd8",
+      "name": "OAAL AI",
+      "symbol": "OAAL",
+      "image": "oaal.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCHrhcBGVVlre8ngBlxLtfte37OGsXeJSmFSmABL8x44QH2",
+      "name": "The Open SOFT",
+      "symbol": "SOFT",
+      "image": "soft.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQD_ETL-SQRFwuxIIDwvo8CiwuVK9o7lXgfNVUSz9tllGMz9",
+      "name": "DYNYA",
+      "symbol": "DYNYA",
+      "image": "dynya.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQBTcytZjdZwFLj6TO7CeGvn4aMmqXvbX-nODiApbd011gT3",
+      "name": "Duck Coin",
+      "symbol": "DUCK",
+      "image": "duck.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCOGp1GAVk51prVBw5DO8QN3lKIlUJKjXbZcl5aXgL5hkwy",
+      "name": "Wrapped NANO",
+      "symbol": "jNANO",
+      "image": "nano.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCL6jaTluAI7ET_JgZ3hPV9Ul8MXP2mZWhMQtGMzd-cNt-X",
+      "name": "Ptah",
+      "symbol": "Y",
+      "image": "y.jpeg",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQAHBPL5Q51kQWMtItT3buuaDz0s_Bq4kN174-RKtlqOu07o",
+      "name": "Rocket Cats",
+      "symbol": "RCAT",
+      "image": "rcat.png",
+      "decimals": 9,
+      "balance": 0
+    },
+    {
+      "type": "jetton",
+      "address": "EQCy_Zo_ahdCCcDyGQazuAVKWa8KSW930j1VI8k9ZQJYB4_V",
+      "name": "SybilZero",
+      "symbol": "jSYBZERO",
+      "image": "jsybzero.png",
+      "decimals": 18,
+      "balance": 0
+    }
+  ]
+}

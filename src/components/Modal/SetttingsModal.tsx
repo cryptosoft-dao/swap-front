@@ -1,11 +1,12 @@
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 
 import { Flex, Grid } from "../wrapper";
 import { ModalBox } from "./Modal.wrapper";
 import { PrimaryButton } from "../Form/Button";
 
 import CloseIcon from "@/assets/icons/close.svg";
+import { ISlippage } from "@/interfaces/interface";
 
 interface IPercentageProps {
    selected: boolean;
@@ -19,10 +20,28 @@ function Percentage(props: IPercentageProps) {
    </div>
 }
 
-export default function SettingModal(props: { close: () => void; active: boolean }) {
+export default function SettingModal(props: {
+   close: () => void;
+   active: boolean;
+   slippage: ISlippage;
+   submit: (slippage: ISlippage) => void;
+}) {
 
    const [customPercentage, setCustomPercentage] = useState<string>("");
    const [selectedPercentage, setSelectedPercentage] = useState<number>(0);
+
+   function submit() {
+      const newSlippage: ISlippage = {
+         type: customPercentage ? "custom" : "default",
+         value: customPercentage ? Number.parseFloat(customPercentage) : selectedPercentage
+      }
+      props.submit(newSlippage);
+      props.close();
+   }
+
+   const disabled = useMemo(() => {
+      return !customPercentage && !selectedPercentage;
+   }, [customPercentage, selectedPercentage]);
 
    useEffect(() => {
       if (selectedPercentage && customPercentage)
@@ -33,6 +52,14 @@ export default function SettingModal(props: { close: () => void; active: boolean
       if (!selectedPercentage || !customPercentage) return;
       setCustomPercentage("");
    }, [selectedPercentage]);
+
+   useEffect(() => {
+      if (props.slippage.type === "default") {
+         setSelectedPercentage(props.slippage.value)
+      } else {
+         setCustomPercentage(`${props.slippage.value}`);
+      }
+   }, [props.slippage]);
 
    return <ModalBox active={props.active}>
       <div className="p-6 !pb-10">
@@ -58,12 +85,16 @@ export default function SettingModal(props: { close: () => void; active: boolean
                      key={index}
                      percentage={percentage}
                      selected={selectedPercentage === percentage}
-                     select={() => setSelectedPercentage(percentage)}
+                     select={() => {
+                        if (selectedPercentage === percentage)
+                           percentage = 0;
+                        setSelectedPercentage(percentage)
+                     }}
                   />)
                }
             </Grid>
          </Grid>
-         <PrimaryButton name="Save" />
+         <PrimaryButton name="Save" click={submit} disabled={disabled} />
       </div>
    </ModalBox>
 }

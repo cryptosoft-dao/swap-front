@@ -7,30 +7,44 @@ import { getBalance, getBalances } from "@/services/account";
 import { IBalance } from "@/interfaces/account";
 import { IContent, IToken } from "@/interfaces/interface";
 
-import { tokens } from "@/utils/tokens";
+import dedustTokens from "@/utils/tokens/dedust.json";
+import stonfiTokens from "@/utils/tokens/stonfi.json";
+
 import { putDecimal } from "@/utils/math";
+
+const reduce = (mapT: any, obj: IToken) => {
+    if (obj.address) mapT[obj.address] = obj
+    return mapT
+}
+// Merge arrays based on unique 'address'
+const tokens: IToken[] = [
+    ...(dedustTokens.assets.reduce(reduce),
+        new Map(stonfiTokens.assets.map(obj => [obj.address, obj]))).values()
+];
 
 export interface IAccountContext {
     tokens: IToken[];
+    balances: Record<string, number>;
     loading: boolean;
 }
 
 export const AccountContext = createContext<IAccountContext>({
     tokens: [],
+    balances: {},
     loading: false
 });
 
 const nativeTokenBalance = {
     decimal: 9,
     balance: 0,
-    address: ""
+    address: "EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c"
 }
 
 export const AccountProvider = (props: React.PropsWithChildren) => {
 
     const { rawWalletAddress } = useTonConnect();
 
-    const [balance, setBalance] = useState<IContent<{
+    const [accountBalance, setBalance] = useState<IContent<{
         balances: IBalance[],
         nativeTokenBalance: {
             decimal: number;
@@ -49,7 +63,7 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
 
     useEffect(() => {
 
-        if (!rawWalletAddress || balance.loading) return;
+        if (!rawWalletAddress || accountBalance.loading) return;
         (async () => {
             setBalance({
                 status: "",
@@ -96,30 +110,35 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
 
     }, [rawWalletAddress]);
 
-    const mappedTokens = useMemo(() => {
+    /*const mappedTokens = useMemo(() => {
         if (balance.loading || balance.status !== "success") return tokens;
 
-        const updatedTokens = tokens.map(token => {
-            const bal = balance.content.balances.find(bal => bal.jetton.symbol.toLocaleLowerCase() === token.symbol.toLocaleLowerCase());
-
-            if (token.native) {
-                const nativeBal = balance.content.nativeTokenBalance
-                token.balance = putDecimal(nativeBal.balance, nativeBal.decimal);
-                token.address = nativeBal.address;
-                return token;
-            }
-
-            if (!bal) return token;
-
+        const updatedTokens: IToken[] = [...tokens];
+        balance.content.balances.forEach(bal => {
+            const token = tokens.find(tk => bal.jetton.symbol.toLocaleLowerCase() === tk.symbol.toLocaleLowerCase());
+            if (!token) return;
             token.balance = putDecimal(Number.parseInt(bal.balance), bal.jetton.decimals);
-            token.address = bal.jetton.address;
             return token;
         });
+
         return updatedTokens;
-    }, [balance]);
+    }, [balance]);*/
+
+    const balances = useMemo(() => {
+        const newBalances: Record<string, number> = {};
+        //Jettons
+        accountBalance.content.balances.forEach(bal => {
+            newBalances[bal.jetton.address] = putDecimal(Number.parseInt(bal.balance), bal.jetton.decimals);
+        })
+        //Native Token
+        const { balance, address, decimal } = accountBalance.content.nativeTokenBalance;
+        newBalances[address] = putDecimal(balance, decimal);
+
+        return newBalances;
+    }, [accountBalance]);
 
     return (
-        <AccountContext.Provider value={{ tokens: mappedTokens, loading: balance.loading }}>
+        <AccountContext.Provider value={{ tokens, balances, loading: accountBalance.loading }}>
             {props.children}
         </AccountContext.Provider>
     );

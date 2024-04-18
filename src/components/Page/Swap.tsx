@@ -19,7 +19,9 @@ import SwapIcon from "@/assets/icons/swapicon.svg";
 import DownIcon from "@/assets/icons/down-icon.svg";
 import InfoIcon from "@/assets/icons/info.svg";
 
-import { IToken } from "@/interfaces/interface";
+import { ISlippage, IToken } from "@/interfaces/interface";
+import swapWithStonfi from "@/services/stonfi";
+import swapWithDedust from "@/services/dedust";
 
 interface INavProps {
     icon: StaticImageData;
@@ -38,15 +40,45 @@ function Nav(props: INavProps) {
 
 export default function Home() {
 
-    const { connected, connect } = useTonConnect();
+    const { connected, connect, walletAddress } = useTonConnect();
     const account = useAccount();
 
     const [sendAmount, setSendAmount] = useState(0);
+    const [slippage, setSlipage] = useState<ISlippage>({
+        type: "default",
+        value: 0
+    });
     const [sendToken, setSendToken] = useState<IToken>(account.tokens[0]);
     const [receiveToken, setReceiveToken] = useState<IToken>(account.tokens[1]);
 
     const [show, setShow] = useState(false);
     const [modal, setModal] = useState("");
+
+
+    async function swap() {
+        alert("SWAP");
+        setModal("progress")
+        try {
+            if (!walletAddress || !sendToken.address || !receiveToken.address) return;
+
+            await swapWithDedust({
+                SWAP_AMOUNT: `${sendAmount}`,
+                SLIPPAGE: slippage.value,
+                JETTON0: sendToken.address,
+                JETTON1: receiveToken.address
+            });
+            await swapWithStonfi({
+                SWAP_AMOUNT: sendAmount,
+                WALLET_ADDRESS: walletAddress,
+                JETTON0: sendToken.address,
+                JETTON1: receiveToken.address
+            });
+
+        } catch (err) {
+            alert((err as Error).message);
+        }
+        setModal("");
+    }
 
     return (
         <Flex className="flex-col h-full">
@@ -60,7 +92,7 @@ export default function Home() {
             <Grid className="gap-4 mt-8 justify-center">
                 <SendTokenField
                     value={sendAmount}
-                    balance={sendToken.balance}
+                    balance={account.balances[sendToken.address || ""]}
                     change={(value) => setSendAmount(value)}
                     tokens={account.tokens}
                     selectedToken={sendToken}
@@ -79,7 +111,7 @@ export default function Home() {
             {connected ? <PrimaryButton
                 name="Swap"
                 className="my-4"
-                click={() => setModal("progress")}
+                click={swap}
                 disabled={account.loading}
             /> : <PrimaryButton
                 name={sendAmount && !connected ? "Connect & Swap" : "Connect"}
@@ -104,7 +136,12 @@ export default function Home() {
                 }
             </div>
             <Footer />
-            <SettingModal active={modal === "settings"} close={() => setModal("")} />
+            <SettingModal
+                active={modal === "settings"}
+                slippage={slippage}
+                submit={(newSlippage) => setSlipage(newSlippage)}
+                close={() => setModal("")}
+            />
             <InfoModal active={modal === "info"} close={() => setModal("")} />
             <ProgressModal active={modal === "progress"} />
         </Flex>
