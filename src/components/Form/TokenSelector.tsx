@@ -48,9 +48,11 @@ function Search(props: ISearchProps) {
 
     function filter(token: IToken) {
         if (!search) return true;
-        const byname = search.toLocaleLowerCase() === token.name.toLocaleLowerCase();
-        const byaddress = token.address && search.toLocaleLowerCase() === token.address.toLocaleLowerCase();
-        return byname || byaddress;
+        const lsearch = search.toLocaleLowerCase();
+        const bysymbol = lsearch === token.symbol.toLocaleLowerCase();
+        const byname = lsearch === token.name.toLocaleLowerCase();
+        const byaddress = token.address && lsearch === token.address.toLocaleLowerCase();
+        return bysymbol || byname || byaddress;
     }
 
     useEffect(() => {
@@ -65,16 +67,20 @@ function Search(props: ISearchProps) {
 
     useEffect(() => {
         const newTokenList = [...tokens].splice(query.skip, query.limit);
-        setList([...list, ...newTokenList]);
+        if(list[0]?.address === newTokenList[0].address) {
+            setList([...newTokenList]);
+        }else{
+            setList([...list, ...newTokenList]);
+        }
         setLoading(false);
-    }, [query]);
+    }, [query, tokens]);
 
     return <Flex className={`flex-col bg-primary absolute top-0 left-0 p-6 h-full max-w-[480px] ${props.className}`}>
         <Grid className="gap-3">
             <SearchInput value={search} handleSearch={(newValue) => setSearch(newValue)} />
             <Flex className="gap-2 flex-wrap">
                 {
-                    tokens.slice(0, 3).map((token, index) => <SuggestedToken
+                    tokens.slice(0, 7).map((token, index) => <SuggestedToken
                         token={token}
                         key={index}
                         select={() => props.selectToken(token)}

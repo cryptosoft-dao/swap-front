@@ -9,7 +9,7 @@ export interface IContent<Type> {
 
 export interface IToken {
   type: string;
-  address?: string;
+  address: string;
   name: string;
   symbol: string;
   image: string;

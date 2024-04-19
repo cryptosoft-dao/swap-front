@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
+import { toUserFriendlyAddress } from "@tonconnect/sdk";
 import { useTonConnect } from "@/hooks/useTONConnect";
 
 import { getBalance, getBalances } from "@/services/account";
@@ -7,20 +8,9 @@ import { getBalance, getBalances } from "@/services/account";
 import { IBalance } from "@/interfaces/account";
 import { IContent, IToken } from "@/interfaces/interface";
 
-import dedustTokens from "@/utils/tokens/dedust.json";
-import stonfiTokens from "@/utils/tokens/stonfi.json";
-
 import { putDecimal } from "@/utils/math";
 
-const reduce = (mapT: any, obj: IToken) => {
-    if (obj.address) mapT[obj.address] = obj
-    return mapT
-}
-// Merge arrays based on unique 'address'
-const tokens: IToken[] = [
-    ...(dedustTokens.assets.reduce(reduce),
-        new Map(stonfiTokens.assets.map(obj => [obj.address, obj]))).values()
-];
+import mappedTokens from "@/utils/tokens/tokens";
 
 export interface IAccountContext {
     tokens: IToken[];
@@ -110,19 +100,38 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
 
     }, [rawWalletAddress]);
 
-    /*const mappedTokens = useMemo(() => {
-        if (balance.loading || balance.status !== "success") return tokens;
+    const tokens = useMemo((): IToken[] => {
+        const newTokens: Record<string, IToken> = { ...mappedTokens };
+        const tokenWithBalances: Record<string, IToken> = {};
 
-        const updatedTokens: IToken[] = [...tokens];
-        balance.content.balances.forEach(bal => {
-            const token = tokens.find(tk => bal.jetton.symbol.toLocaleLowerCase() === tk.symbol.toLocaleLowerCase());
-            if (!token) return;
-            token.balance = putDecimal(Number.parseInt(bal.balance), bal.jetton.decimals);
-            return token;
-        });
-
-        return updatedTokens;
-    }, [balance]);*/
+        if (accountBalance.status === "success") {
+            //Map native balance
+            const { balance, decimal, address } = accountBalance.content.nativeTokenBalance;
+            if (newTokens[address]) {
+                //Copy token
+                const nativeToken = { ...newTokens[address] }
+                //Delete token from list
+                delete newTokens[address];
+                //Update balance
+                nativeToken.balance = putDecimal(balance, decimal);
+                tokenWithBalances[address] = nativeToken;
+            }
+            //Map Jetton balance
+            accountBalance.content.balances.forEach(bal => {
+                const jettonAddress = toUserFriendlyAddress(bal.jetton.address);
+                console.log(jettonAddress);
+                if (!newTokens[jettonAddress]) return;
+                //Copy token
+                const token = { ...newTokens[jettonAddress] }
+                //Delete token from list
+                delete newTokens[jettonAddress]
+                token.balance = putDecimal(Number.parseInt(bal.balance), bal.jetton.decimals);
+                tokenWithBalances[jettonAddress] = token;
+            });
+        }
+        console.log(tokenWithBalances);
+        return [...Object.values(tokenWithBalances), ...Object.values(newTokens)];
+    }, [accountBalance]);
 
     const balances = useMemo(() => {
         const newBalances: Record<string, number> = {};

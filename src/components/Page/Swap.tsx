@@ -92,7 +92,7 @@ export default function Home() {
             <Grid className="gap-4 mt-8 justify-center">
                 <SendTokenField
                     value={sendAmount}
-                    balance={account.balances[sendToken.address || ""]}
+                    balance={account.balances[sendToken.address]}
                     change={(value) => setSendAmount(value)}
                     tokens={account.tokens}
                     selectedToken={sendToken}
