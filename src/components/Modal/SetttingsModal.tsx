@@ -39,10 +39,6 @@ export default function SettingModal(props: {
       props.close();
    }
 
-   const disabled = useMemo(() => {
-      return !customPercentage && !selectedPercentage;
-   }, [customPercentage, selectedPercentage]);
-
    useEffect(() => {
       if (selectedPercentage && customPercentage)
          setSelectedPercentage(0);
@@ -94,7 +90,7 @@ export default function SettingModal(props: {
                }
             </Grid>
          </Grid>
-         <PrimaryButton name="Save" click={submit} disabled={disabled} />
+         <PrimaryButton name="Save" click={submit} />
       </div>
    </ModalBox>
 }

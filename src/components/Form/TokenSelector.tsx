@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
+import { Address } from "@ton/core";
 import Image from "next/image";
 
 import { useAccount } from "@/context/AccountProvider";
@@ -13,7 +14,6 @@ import ArrowUp from "@/assets/icons/down-icon.svg";
 import { IToken } from "@/interfaces/interface";
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 import { CircularLoader } from "../Loader";
-import React from "react";
 
 interface ISelectorProps {
     selectedToken: IToken;
@@ -29,7 +29,7 @@ interface ISearchProps {
 
 function Search(props: ISearchProps) {
 
-    const { tokens, balances } = useAccount();
+    const { tokens, getBalance } = useAccount();
     const [search, setSearch] = useState("");
 
     const [loading, setLoading] = useState(false);
@@ -67,9 +67,9 @@ function Search(props: ISearchProps) {
 
     useEffect(() => {
         const newTokenList = [...tokens].splice(query.skip, query.limit);
-        if(list[0]?.address === newTokenList[0].address) {
+        if (list[0]?.address === newTokenList[0].address) {
             setList([...newTokenList]);
-        }else{
+        } else {
             setList([...list, ...newTokenList]);
         }
         setLoading(false);
@@ -96,8 +96,10 @@ function Search(props: ISearchProps) {
                     list.map((token, index) => <ListToken
                         key={index}
                         token={token}
-                        balance={balances[token?.address || ""] || 0}
-                        select={() => props.selectToken(token)}
+                        select={() => props.selectToken({
+                            ...token,
+                            address: Address.parse(token.address).toRawString()
+                        })}
                     />)
                 }
                 {loading && <CircularLoader className="mx-auto my-1" />}

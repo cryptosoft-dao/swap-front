@@ -11,23 +11,24 @@ import { IContent, IToken } from "@/interfaces/interface";
 import { putDecimal } from "@/utils/math";
 
 import mappedTokens from "@/utils/tokens/tokens";
+import { Address } from "@ton/core";
 
 export interface IAccountContext {
     tokens: IToken[];
-    balances: Record<string, number>;
+    getBalance: (address: string) => number;
     loading: boolean;
 }
 
 export const AccountContext = createContext<IAccountContext>({
     tokens: [],
-    balances: {},
+    getBalance: (address: string) => 0,
     loading: false
 });
 
 const nativeTokenBalance = {
     decimal: 9,
     balance: 0,
-    address: "EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c"
+    address: Address.parse("EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c").toRawString()
 }
 
 export const AccountProvider = (props: React.PropsWithChildren) => {
@@ -118,8 +119,7 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
             }
             //Map Jetton balance
             accountBalance.content.balances.forEach(bal => {
-                const jettonAddress = toUserFriendlyAddress(bal.jetton.address);
-                console.log(jettonAddress);
+                const jettonAddress = bal.jetton.address;
                 if (!newTokens[jettonAddress]) return;
                 //Copy token
                 const token = { ...newTokens[jettonAddress] }
@@ -129,7 +129,6 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
                 tokenWithBalances[jettonAddress] = token;
             });
         }
-        console.log(tokenWithBalances);
         return [...Object.values(tokenWithBalances), ...Object.values(newTokens)];
     }, [accountBalance]);
 
@@ -146,8 +145,17 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
         return newBalances;
     }, [accountBalance]);
 
+    function getTokenBalance(address: string) {
+        const rawAddress = Address.parse(address).toRawString();
+        return balances[rawAddress]
+    }
+
     return (
-        <AccountContext.Provider value={{ tokens, balances, loading: accountBalance.loading }}>
+        <AccountContext.Provider value={{
+            tokens,
+            getBalance: getTokenBalance,
+            loading: accountBalance.loading
+        }}>
             {props.children}
         </AccountContext.Provider>
     );
