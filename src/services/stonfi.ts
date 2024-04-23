@@ -2,9 +2,6 @@ import TonWeb from "tonweb";
 
 import { Router, ROUTER_REVISION, ROUTER_REVISION_ADDRESS } from "@ston-fi/sdk";
 
-/**
- * This example shows how to swap two jettons using the router contract
- */
 export default async function swapWithStonfi({
   WALLET_ADDRESS,
   JETTON0,

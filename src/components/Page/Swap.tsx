@@ -19,11 +19,12 @@ import SwapIcon from "@/assets/icons/swapicon.svg";
 import DownIcon from "@/assets/icons/down-icon.svg";
 import InfoIcon from "@/assets/icons/info.svg";
 
-import { IContent, ISlippage, IToken } from "@/interfaces/interface";
 import swapWithStonfi from "@/services/stonfi";
 import swapWithDedust from "@/services/dedust";
-import { ISwapDetails } from "@/interfaces/request";
 import { getSwapDetails } from "@/services/swap";
+
+import { IContent, ISlippage, IToken } from "@/interfaces/interface";
+import { ISwapDetails } from "@/interfaces/request";
 
 interface INavProps {
     icon: StaticImageData;
@@ -51,18 +52,20 @@ export default function Home() {
         content: null,
         message: ''
     })
-    const [sendAmount, setSendAmount] = useState(0);
     const [slippage, setSlipage] = useState<ISlippage>({
         type: "default",
-        value: 0
+        value: 1
     });
+    const [sendAmount, setSendAmount] = useState(0);
     const [sendToken, setSendToken] = useState<IToken>(account.tokens[0]);
     const [receiveToken, setReceiveToken] = useState<IToken>(account.tokens[1]);
+    const [fetch, setFetch] = useState<'wait' | 'fetch'>('wait');
+
+    const [show, setShow] = useState(false);
+    const [modal, setModal] = useState("");
 
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
-    const [show, setShow] = useState(false);
-    const [modal, setModal] = useState("");
 
     async function fetchSwapdetails() {
         if (swapdetails.loading) return;
@@ -103,7 +106,6 @@ export default function Home() {
     async function swap() {
         alert("SWAP");
         setModal("progress");
-        /*
         try {
             if (!walletAddress || !sendToken.address || !receiveToken.address) return;
 
@@ -122,14 +124,9 @@ export default function Home() {
 
         } catch (err) {
             alert((err as Error).message);
-        }*/
+        }
         setModal("");
     }
-
-    useEffect(() => {
-        if (!slippage.value) return;
-        fetchSwapdetails();
-    }, [slippage]);
 
     const distributionPlan = useMemo(() => {
         return <p
@@ -143,18 +140,26 @@ export default function Home() {
     }, [slippage, receiveToken]);
 
     const receiveBalance = useMemo(() => {
-        const originalBal = Number.parseFloat((sendAmount * Number.parseFloat(swapdetails.content?.swap_rate || "0")).toFixed(4));
-        const fees = Number.parseFloat(swapdetails.content?.fee_percent || "0");
-        return Math.round(originalBal - (originalBal * fees))
+        const swapRate = Number.parseFloat(swapdetails.content?.swap_rate || "0");
+        const askAmount = (sendAmount * swapRate).toFixed(4);
+        return Number.parseFloat(askAmount);
     }, [swapdetails, sendAmount]);
+
+    useEffect(() => {
+        if (!slippage.value || !sendAmount) return;
+        fetchSwapdetails();
+    }, [slippage, sendToken, receiveToken]);
+
+    useEffect(() => {
+        if (fetch === 'wait') return;
+        fetchSwapdetails().finally(() => setFetch('wait'));
+    }, [fetch]);
 
     useEffect(() => {
         if (!inputRef.current) return;
         function handleComplete() {
-            timeoutRef.current && clearInterval(timeoutRef.current);
-            setTimeout(() => {
-                fetchSwapdetails();
-            }, 3);
+            timeoutRef.current && clearTimeout(timeoutRef.current);
+            timeoutRef.current = setTimeout(() => setFetch('fetch'), 2000);
         }
         inputRef.current.addEventListener('change', handleComplete);
         return () => {
@@ -177,7 +182,6 @@ export default function Home() {
                     value={sendAmount}
                     balance={account.getBalance(sendToken.address)}
                     change={(value) => setSendAmount(value)}
-                    tokens={account.tokens}
                     selectedToken={sendToken}
                     selectToken={(token) => setSendToken(token)}
                     readonly={swapdetails.loading}
@@ -187,7 +191,6 @@ export default function Home() {
                     inputRef={inputRef}
                     value={receiveBalance}
                     balance={receiveBalance}
-                    tokens={account.tokens}
                     selectedToken={receiveToken}
                     selectToken={(token) => setReceiveToken(token)}
                     readonly={true}
@@ -212,7 +215,7 @@ export default function Home() {
                     <Grid className={`gap-5 my-6 ${show ? 'h-auto' : 'h-0'} overflow-hidden`}>
                         <List name="Price" value={`1 ${sendToken.symbol} ≈ ${swapdetails?.content?.swap_rate || "0.00"} ${receiveToken.symbol}`} />
                         <List name="Price impact" icon={InfoIcon} value={`${swapdetails.content?.price_impact || "0.00"}%`} valueClassName="!text-red" click={() => setModal('info')} />
-                        <List name="Minimum received" icon={InfoIcon} value={`~ ${Number.parseFloat(swapdetails.content?.ask_units || '0') / 100} ${receiveToken.symbol}`} />
+                        <List name="Minimum received" icon={InfoIcon} value={`~ ${receiveBalance} ${receiveToken.symbol}`} />
                         <List name="Blockchain fee" value={`${Number.parseFloat(swapdetails.content?.fee_units || "0") / 100} ${sendToken.symbol}`} />
                         <List name="Your economy" value="0.00%" valueClassName="!text-green" />
                         <List

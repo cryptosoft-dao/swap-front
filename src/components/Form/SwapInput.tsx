@@ -8,7 +8,6 @@ interface ISwapFieldProps {
     balance: number;
     change?: (value: number) => void;
     readonly?: boolean;
-    tokens: IToken[];
     selectedToken: IToken;
     selectToken: (token: IToken) => void;
     error?: string;
@@ -34,7 +33,6 @@ function SwapField(props: ISwapFieldProps) {
             onChange={(event) => props.change && props.change(Number.parseFloat(event.currentTarget.value))}
         />
         <TokenSelector
-            tokens={props.tokens}
             selectedToken={props.selectedToken}
             selectToken={props.selectToken}
         />
@@ -54,7 +52,6 @@ function TokenField(props: ITokenFieldProps) {
                 balance={props.balance}
                 change={props.change}
                 readonly={props.readonly}
-                tokens={props.tokens}
                 selectToken={props.selectToken}
                 selectedToken={props.selectedToken}
                 inputRef={props.inputRef}
@@ -81,7 +78,6 @@ export function SendTokenField(props: ISwapFieldProps) {
         change={props.change}
         balance={props.balance}
         readonly={props.readonly}
-        tokens={props.tokens}
         selectToken={props.selectToken}
         selectedToken={props.selectedToken}
         inputRef={props.inputRef}
@@ -102,7 +98,6 @@ export function ReceiveTokenField(props: ISwapFieldProps) {
         value={props.value}
         balance={props.balance}
         readonly={props.readonly}
-        tokens={props.tokens}
         selectToken={props.selectToken}
         selectedToken={props.selectedToken}
         error={props.error}

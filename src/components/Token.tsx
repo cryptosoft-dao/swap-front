@@ -53,7 +53,7 @@ export function ListToken(props: ITokenProps) {
         </Flex>
         <Flex className="!w-fit gap-2">
             <span className={`text_14_400_SFText leading-none text-text_primary my-auto ${props.token.balance ? "" : "hidden"}`}>{props.token.balance}{" "}{props.token.name}</span>
-            <Image className="my-auto" src={ArrowRightIcon} alt={"arrow-right"} />
+            <Image className="my-auto" loading="lazy" src={ArrowRightIcon} alt={"arrow-right"} />
         </Flex>
     </Flex>
 }

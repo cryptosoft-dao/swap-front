@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 
-import { toUserFriendlyAddress } from "@tonconnect/sdk";
 import { useTonConnect } from "@/hooks/useTONConnect";
 
 import { getBalance, getBalances } from "@/services/account";
@@ -9,8 +8,8 @@ import { IBalance } from "@/interfaces/account";
 import { IContent, IToken } from "@/interfaces/interface";
 
 import { putDecimal } from "@/utils/math";
-
 import mappedTokens from "@/utils/tokens/tokens";
+
 import { Address } from "@ton/core";
 
 export interface IAccountContext {

@@ -1,5 +1,4 @@
 import React, { useEffect, useState } from "react";
-import { Address } from "@ton/core";
 import Image from "next/image";
 
 import { useAccount } from "@/context/AccountProvider";
@@ -18,7 +17,6 @@ import { CircularLoader } from "../Loader";
 interface ISelectorProps {
     selectedToken: IToken;
     selectToken: (token: IToken) => void;
-    tokens: IToken[];
     className?: string;
 }
 
@@ -29,10 +27,11 @@ interface ISearchProps {
 
 function Search(props: ISearchProps) {
 
-    const { tokens, getBalance } = useAccount();
+    const { tokens } = useAccount();
     const [search, setSearch] = useState("");
 
     const [loading, setLoading] = useState(false);
+    const [componentVisibility, setComponentVisibility] = useState<boolean>(true);
     const [list, setList] = useState<IToken[]>([]);
     const [query, setQuery] = useState({
         page: 0,
@@ -75,8 +74,32 @@ function Search(props: ISearchProps) {
         setLoading(false);
     }, [query, tokens]);
 
+    useEffect(() => {
+        if (!containerRef.current) return;
+        const originalHeight = 100;
+        function checkScroll() {
+            if (!containerRef.current) return;
+            const isMoreThanHeight = containerRef.current?.scrollTop > originalHeight;
+            if (isMoreThanHeight) {
+                componentVisibility && setComponentVisibility(false);
+            } else {
+                setComponentVisibility(true);
+            }
+        }
+        containerRef.current.addEventListener('scroll', checkScroll);
+
+        return () => {
+            containerRef.current?.removeEventListener('scroll', checkScroll);
+        }
+
+    }, []);
+
     return <Flex className={`flex-col bg-primary absolute top-0 left-0 p-6 h-full max-w-[480px] ${props.className}`}>
-        <Grid className="gap-3">
+        <div className={`grid gap-3 overflow-hidden`} style={{
+            height: componentVisibility ? '210px' : '0px',
+            marginBottom: componentVisibility ? "24px" : "0",
+            transition: "all 0.4s"
+        }}>
             <SearchInput value={search} handleSearch={(newValue) => setSearch(newValue)} />
             <Flex className="gap-2 flex-wrap">
                 {
@@ -87,26 +110,22 @@ function Search(props: ISearchProps) {
                     />)
                 }
             </Flex>
-        </Grid>
-        <h2 className="text_20_700_SFText text-white mt-6">Tokens</h2>
-        <div className="flex-1 overflow-y-auto py-6" ref={containerRef}>
-
+        </div>
+        <h2 className="text_20_700_SFText text-white mb-6">Tokens</h2>
+        <div className="flex-1 overflow-y-auto pb-6" ref={containerRef}>
             <Grid className="w-full gap-6">
                 {
                     list.map((token, index) => <ListToken
                         key={index}
                         token={token}
-                        select={() => props.selectToken({
-                            ...token,
-                            address: Address.parse(token.address).toRawString()
-                        })}
+                        select={() => props.selectToken(token)}
                     />)
                 }
                 {loading && <CircularLoader className="mx-auto my-1" />}
             </Grid>
         </div>
         <Footer />
-    </Flex>
+    </Flex >
 }
 
 const MemoizedSearch = React.memo(Search);
