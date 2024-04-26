@@ -1,6 +1,10 @@
 import axios from "axios";
 
-import { IRequestProps, IResponse } from "@/interfaces/request";
+import {
+  IPostRequestProps,
+  IRequestProps,
+  IResponse,
+} from "@/interfaces/request";
 
 export async function get<T>(option: IRequestProps): Promise<IResponse<T>> {
   try {
@@ -27,9 +31,11 @@ export async function get<T>(option: IRequestProps): Promise<IResponse<T>> {
   }
 }
 
-export async function post<T>(option: IRequestProps): Promise<IResponse<T>> {
+export async function post<T>(
+  option: IPostRequestProps
+): Promise<IResponse<T>> {
   try {
-    const res = await axios.post(option.url, {
+    const res = await axios.post(option.url, option.data || {}, {
       headers: {
         Accept: "application/json",
       },

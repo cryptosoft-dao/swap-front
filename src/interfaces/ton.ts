@@ -20,7 +20,7 @@ export interface INativeBalance {
   is_wallet: boolean;
 }
 
-export interface IBalance {
+export interface IJettonBalance {
   balance: string;
   price: {
     prices: {

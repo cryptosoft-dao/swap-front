@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 import { Box, Flex } from "../wrapper";
 import { TokenSelector } from "./TokenSelector";
 import { IToken } from "@/interfaces/interface";
@@ -6,12 +6,13 @@ import { IToken } from "@/interfaces/interface";
 interface ISwapFieldProps {
     value: number;
     balance: number;
-    change?: (value: number) => void;
     readonly?: boolean;
-    selectedToken: IToken;
-    selectToken: (token: IToken) => void;
+    selectedToken?: IToken;
     error?: string;
     inputRef: React.MutableRefObject<HTMLInputElement | null>;
+    change?: (value: number) => void;
+    toggleSelector:() => void;
+    disabled?:boolean;
 }
 
 interface ITokenFieldProps extends ISwapFieldProps {
@@ -22,7 +23,7 @@ interface ITokenFieldProps extends ISwapFieldProps {
 
 function SwapField(props: ISwapFieldProps) {
 
-    return <Flex className="mt-4 mb-1">
+    return <Flex className="relative mt-4 mb-1">
         <input
             ref={props.inputRef}
             className="w-full h-fit outline-none bg-transparent text_24_600_SFText placeholder:text-text_primary leading-none text-white"
@@ -34,7 +35,7 @@ function SwapField(props: ISwapFieldProps) {
         />
         <TokenSelector
             selectedToken={props.selectedToken}
-            selectToken={props.selectToken}
+            toggleSelector={props.toggleSelector}
         />
     </Flex>
 }
@@ -45,29 +46,31 @@ function Label(props: { label: string; className?: string }) {
 
 function TokenField(props: ITokenFieldProps) {
     return <Flex className="flex-col gap-2">
-        <Box className={`w-full px-[10px] py-[10px] bg-secondary ${props.error ? "!border-red" : '!border-none'}`}>
+        <Box className={`relative w-full px-[10px] py-[10px] bg-secondary ${props.error ? "!border-red" : '!border-none'}`}>
             {props.label}
             <SwapField
                 value={props.value}
                 balance={props.balance}
                 change={props.change}
                 readonly={props.readonly}
-                selectToken={props.selectToken}
                 selectedToken={props.selectedToken}
                 inputRef={props.inputRef}
                 error={props.error}
+                toggleSelector={props.toggleSelector}
+                disabled={props.disabled}
             />
+             {props.disabled && <div className="absolute top-0 left-0 w-full h-full cursor-not-allowed bg-black/10"></div>}
         </Box>
         {props.error && <Label className="!text-red" label={props.error} />}
     </Flex>
 }
 
-export function SendTokenField(props: ISwapFieldProps) {
+function SendTokenField(props: ISwapFieldProps) {
 
     const LabelNode = <div className="flex justify-between">
         <Label label="You Send" />
         {props.balance ? <div className="flex gap-1">
-            <Label label={`${props.balance} ${props.selectedToken.symbol}`} />
+            <Label label={`${props.balance} ${props.selectedToken?.symbol || ""}`} />
             <Label label="MAX" className={"!text-blue"} />
         </div> : <></>}
     </div>;
@@ -78,18 +81,19 @@ export function SendTokenField(props: ISwapFieldProps) {
         change={props.change}
         balance={props.balance}
         readonly={props.readonly}
-        selectToken={props.selectToken}
         selectedToken={props.selectedToken}
         inputRef={props.inputRef}
         error={props.error}
+        toggleSelector={props.toggleSelector}
+        disabled={props.disabled}
     />
 }
 
-export function ReceiveTokenField(props: ISwapFieldProps) {
+function ReceiveTokenField(props: ISwapFieldProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const LabelNode = <div className="flex justify-between">
         <Label label="You Recieve" />
-        <Label label={props.balance ? `${props.balance} ${props.selectedToken.name}` : ''} />
+        <Label label={props.balance ? `${props.balance} ${props.selectedToken?.symbol || ""}` : ''} />
     </div>;
 
     return <TokenField
@@ -98,8 +102,12 @@ export function ReceiveTokenField(props: ISwapFieldProps) {
         value={props.value}
         balance={props.balance}
         readonly={props.readonly}
-        selectToken={props.selectToken}
         selectedToken={props.selectedToken}
         error={props.error}
+        toggleSelector={props.toggleSelector}
+        disabled={props.disabled}
     />
 }
+
+export const MemoizedSendTokenField = React.memo(SendTokenField);
+export const MemoizedReceiveTokenField = React.memo(ReceiveTokenField);

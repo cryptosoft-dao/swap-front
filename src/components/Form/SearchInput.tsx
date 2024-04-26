@@ -1,7 +1,7 @@
 import { Box } from "../wrapper";
 
 export default function SearchInput(props: { value: string; handleSearch: (newValue: string) => void; }) {
-    return <Box className={`flex px-6 py-4`}>
+    return <Box className={`flex !h-fit px-6 py-4`}>
         <input
             className="w-full outline-none bg-transparent text_15_400_SFText text-white"
             value={props.value}

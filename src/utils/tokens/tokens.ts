@@ -1,11 +1,22 @@
-import { IToken } from "@/interfaces/interface";
+import { Address } from "@ton/core";
 
 import dedustTokens from "@/utils/tokens/dedust.json";
 import stonfiTokens from "@/utils/tokens/stonfi.json";
-import { Address } from "@ton/core";
+
+import { MappedToken } from "@/interfaces/interface";
+
+export const NATIVE = "native";
+export const JETTON = "jetton";
+
+export const TONTokenAddress = "EQAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAM9c";
+export const TONToken = {
+  decimal: 9,
+  balance: 0,
+  address: Address.parse(TONTokenAddress).toRawString(),
+};
 
 function getMappedTokens() {
-  const mappedTokens: Record<string, IToken> = {};
+  const mappedTokens: MappedToken = {};
 
   //Map deduct tokens
   dedustTokens.assets.forEach((token) => {
