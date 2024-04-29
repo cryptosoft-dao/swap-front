@@ -59,7 +59,7 @@ function TokenField(props: ITokenFieldProps) {
                 toggleSelector={props.toggleSelector}
                 disabled={props.disabled}
             />
-            {props.disabled && <div className="absolute top-0 left-0 w-full h-full cursor-not-allowed bg-black/10"></div>}
+            {props.disabled && <div className="absolute top-0 left-0 z-10 w-full h-full cursor-not-allowed bg-black/10"></div>}
         </Box>
         {props.error && <Label className="!text-red" label={props.error} />}
     </Flex>

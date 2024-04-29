@@ -26,7 +26,6 @@ import ReloadIcon from "@/assets/icons/reload.svg";
 import SwapIcon from "@/assets/icons/swapicon.svg";
 import UpIcon from "@/assets/icons/UpArrow.svg";
 import DownIcon from "@/assets/icons/down-icon.svg";
-import InfoIcon from "@/assets/icons/info.svg";
 
 import swapWithStonfi from "@/services/swap/stonfi";
 import swapWithDedust from "@/services/swap/dedust";
@@ -40,12 +39,13 @@ interface INavProps {
     icon: StaticImageData;
     label: string;
     click?: () => void;
+    disabled?: boolean;
 }
 
 function Nav(props: INavProps) {
     return <div
         onClick={props.click}
-        className="flex w-[32px] h-[32px] border border-border_primary rounded-full cursor-pointer"
+        className={`flex w-[32px] h-[32px] border border-border_primary rounded-full ${props.disabled ? "cursor-not-allowed" : "cursor-pointer "}`}
     >
         <Image className="m-auto w-[16px] h-[16px]" src={props.icon} alt={props.label} />
     </div>
@@ -59,6 +59,7 @@ export default function Home() {
     const {
         isReady,
         tokens,
+        getToken,
         secondaryTokens,
         pool,
         primarySelector,
@@ -80,6 +81,12 @@ export default function Home() {
 
     const [show, setShow] = useState(true);
     const [modal, setModal] = useState("");
+
+    function reload() {
+        if (!simulateQuery.ready || isDisabled) return;
+        resetTimer();
+        initSimulator(simulateQuery.query)
+    }
 
     async function swap() {
         if (!provider || !client)
@@ -136,25 +143,27 @@ export default function Home() {
     }
 
     const distributionPlan = useMemo(() => {
-        console.log("Distribution plan");
         let reserved: Record<string, IReserve> = {};
+        let loaded = false;
         if (pool.data?.data) {
             reserved = calculateReserve(pool.data?.data);
+            loaded = true;
         }
         const data = Object.values(reserved).sort((a, b) => b.reserve - a.reserve);
         const comp = <p
-            className="max-w-[50%] flex flex-wrap justify-end text-right text-white text_14_400_Inter gap-1"
+            className="max-w-[50%] flex justify-end text-right text-white text_14_400_Inter gap-1"
         >
             <span className={`${data[0]?.reserve ? "" : "hidden"} whitespace-nowrap `}>{`${data[0]?.platform} >`}</span>
             <span className={`${data[0]?.reserve ? "" : "hidden"} text-green`}>{`${data[0]?.reserve}%`}</span>
-            {data[0]?.reserve && data[1]?.reserve ? <span>{"|"}</span> : <></>}
+            {data[0]?.reserve && data[1]?.reserve ? <span className="!text-text_primary">{"|"}</span> : <></>}
             <span className={`${data[1]?.reserve ? "" : "hidden"} whitespace-nowrap `}>{`${data[1]?.platform} >`}</span>
             <span className={`${data[1]?.reserve ? "" : "hidden"} text-green`}>{`${data[1]?.reserve}%`}</span>
         </p>;
 
         return {
             reserved,
-            comp
+            comp,
+            loaded
         }
     }, [pool]);
 
@@ -176,16 +185,16 @@ export default function Home() {
             return "Insufficient balance";
 
         return "";
-    }, [connectionChecked, connected, sendInput.value, primarySelector.token, pool]);
+    }, [connectionChecked, connected, sendInput.value, primarySelector.token]);
 
     const secondaryFieldError = useMemo(() => {
         if (pool.loading || !pool.data) return "";
         return pool.data.swapable ? "" : "Token not swapable, please select another token";
-    }, [secondarySelector.token, pool]);
+    }, [pool]);
 
     const simulateQuery = useMemo(() => {
 
-        const ready = (sendInput.inputEnd && (sendInput.value > 0) && primarySelector.token && secondarySelector.token && !primaryFieldError && !secondaryFieldError) ? true : false;
+        const ready = (sendInput.inputEnd && (sendInput.value > 0) && primarySelector.token && secondarySelector.token && !primaryFieldError && !secondaryFieldError && distributionPlan.loaded) ? true : false;
         const query: ISimulateArgs = {
             primary: primarySelector.token,
             secondary: secondarySelector.token,
@@ -205,7 +214,7 @@ export default function Home() {
             query,
             ready
         }
-    }, [sendInput.inputEnd, primarySelector.token, secondarySelector.token, slippage, distributionPlan.reserved, primaryFieldError, secondaryFieldError]);
+    }, [sendInput.inputEnd, primarySelector.token, secondarySelector.token, slippage, distributionPlan]);
 
     const isDisabled = useMemo(() => {
         return simulateData.loading || pool.loading;
@@ -213,26 +222,17 @@ export default function Home() {
 
     //INITIALIZE PRIMARY SELECTOR
     useEffect(() => {
+        console.log("Primary Tokens");
         if (primarySelector.token) return;
         primarySelector.selectToken(tokens[0]);
     }, [tokens]);
 
     //INITIALIZE PRIMARY SELECTOR
     useEffect(() => {
-        secondarySelector.selectToken(secondarySelector.token || secondaryTokens[0])
+        if (!secondaryTokens.length) return;
+        const selectedToken = secondarySelector.token || getToken("EQCyDhcASwIm8-eVVTzMEESYAeQ7ettasfuGXUG1tkDwVJbc") || secondaryTokens[0];
+        secondarySelector.selectToken(selectedToken)
     }, [secondaryTokens]);
-
-    //RESET SWAP SIMULATOR ON PRIMARY SELECTOR OPEN
-    useEffect(() => {
-        if (primarySelector.selector === 'none') return;
-        resetSimulator();
-    }, [primarySelector.selector]);
-
-    //RESET SWAP SIMULATOR ON SECONDARY SELECTOR OPEN
-    useEffect(() => {
-        if (secondarySelector.selector === 'none') return;
-        resetSimulator();
-    }, [secondarySelector.selector]);
 
     //RESET SWAP ON INPUT
     useEffect(() => {
@@ -241,9 +241,8 @@ export default function Home() {
 
     //INITIALIZE SWAP SIMULATOR FOR NEW DATA
     useEffect(() => {
-        if (!simulateQuery.ready)
-            resetTimer();
-        else
+        resetTimer();
+        if (simulateQuery.ready && [primarySelector.selector, secondarySelector.selector].includes("none"))
             initSimulator(simulateQuery.query);
     }, [simulateQuery]);
 
@@ -252,7 +251,12 @@ export default function Home() {
             <div className="flex justify-between">
                 <h2 className=" text-white text_20_700_SFText">Swap</h2>
                 <div className="grid grid-cols-2 gap-2">
-                    <Nav icon={ReloadIcon} label="reload" />
+                    <Nav
+                        icon={ReloadIcon}
+                        label="reload"
+                        click={reload}
+                        disabled={!simulateQuery.ready || isDisabled}
+                    />
                     <Nav icon={SettingIcon} label="setting" click={() => setModal("settings")} />
                 </div>
             </div>
@@ -263,7 +267,11 @@ export default function Home() {
                     balance={getBalance(primarySelector.token?.address || "")}
                     change={sendInput.handleInput}
                     selectedToken={primarySelector.token}
-                    toggleSelector={primarySelector.toggleSelector}
+                    toggleSelector={() => {
+                        if (isDisabled) return;
+                        resetSimulator();
+                        primarySelector.toggleSelector()
+                    }}
                     readonly={isDisabled}
                     disabled={isDisabled}
                     error={primaryFieldError}
@@ -274,7 +282,11 @@ export default function Home() {
                     value={receiveBalance}
                     balance={receiveBalance}
                     selectedToken={secondarySelector.token}
-                    toggleSelector={secondarySelector.toggleSelector}
+                    toggleSelector={() => {
+                        if (isDisabled) return;
+                        resetSimulator();
+                        secondarySelector.toggleSelector()
+                    }}
                     readonly={true}
                     disabled={isDisabled}
                     error={secondaryFieldError}
@@ -303,6 +315,7 @@ export default function Home() {
                         <List
                             name="Distribution Plan"
                             value={distributionPlan.comp}
+                            className="!mb-auto !mt-0 !leading-[18px]"
                         />
                     </Grid>
                 }

@@ -21,6 +21,7 @@ export interface IAccountContext {
     tokens: IToken[];
     secondaryTokens: IToken[];
     getBalance: (address: string) => number;
+    getToken:(address:string) => IToken | undefined;
     pool: {
         loading: boolean;
         data: { data: IPool; swapable: boolean } | null
@@ -34,6 +35,7 @@ export const AccountContext = createContext<IAccountContext>({
     tokens: [],
     secondaryTokens: [],
     getBalance: (address: string) => 0,
+    getToken:(address:string)=>undefined,
     pool: {
         loading: false,
         data: null
@@ -76,6 +78,10 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
         const rawAddress = Address.parse(address).toRawString();
         return accountBalance.content[rawAddress]
     }
+
+    function getToken(address:string) {
+        return secondaryTokens.find(token => token.address === address);
+    } 
 
     const tokens = useMemo(() => {
         return Token_Data.data as MappedToken
@@ -147,7 +153,7 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
             ...tokenWithBalances,
             ...secondaryTokens
         }
-    }, [primarySelector]);
+    }, [primarySelector.token]);
 
     const primaryTokens = useMemo(() => {
         return Object.values(primaryMappedTokens)
@@ -267,6 +273,7 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
         <AccountContext.Provider value={{
             isReady: isBalanceLoaded,
             tokens: primaryTokens,
+            getToken,
             secondaryTokens: secondaryTokens,
             getBalance: getTokenBalance,
             pool: {

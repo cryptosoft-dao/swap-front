@@ -9,6 +9,7 @@ export default function Loader(props: { className?: string }) {
             alt="rocket"
             className="m-auto"
         />
+
     </div>
 }
 

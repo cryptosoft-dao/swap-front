@@ -103,6 +103,12 @@ export default function useSimulate() {
             }
 
             const newSimulateData = getAvgSimulatorData(simulateArgs);
+            
+            //Reset previous interval
+            resetTimer();
+            timeoutRef.current = setTimeout(async () => {
+                await fetchSimulateData(args);
+            }, IntervalInMS);
 
             setSimulateData({
                 status: "success",
@@ -110,12 +116,6 @@ export default function useSimulate() {
                 content: newSimulateData,
                 message: ""
             });
-
-            //Reset previous interval
-            resetTimer();
-            timeoutRef.current = setTimeout(async () => {
-                await fetchSimulateData(args);
-            }, IntervalInMS);
 
         } catch (err) {
             setSimulateData({

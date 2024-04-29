@@ -1,5 +1,5 @@
 import { IToken, ITokenSelectorHook, Selector } from "@/interfaces/interface";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 export default function useTokenSelector(initialSelector: Selector, initialToken?: IToken): ITokenSelectorHook {
     const [selector, setSelector] = useState<Selector>('none');
@@ -11,6 +11,16 @@ export default function useTokenSelector(initialSelector: Selector, initialToken
     }
 
     const selectToken = (token?: IToken) => setToken(token);
+
+    useEffect(() => {
+        console.log(selector);
+        if (selector === "none") return;
+        setToken(undefined);
+    }, [selector]);
+
+    useEffect(() => {
+       console.log(token);
+    },[token]); 
 
     return {
         token,
