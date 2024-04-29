@@ -1,29 +1,30 @@
 import React, { createContext, useContext, useEffect, useMemo, useState } from "react";
 import { Address } from "@ton/core";
 
-import { useTonConnect } from "@/hooks/useTONConnect";
+import { useTonConnect } from "@/hooks/useTConnect";
 import useTokenSelector from "@/hooks/useTokenSelector";
 
+import Token_Data from "@/data/token.json";
+import Pool_Data from "@/data/pool.json";
+
 import { putDecimal } from "@/utils/math";
-import mappedTokens, { TONToken } from "@/utils/tokens/tokens";
-import { mergeStonfiPoolInDedustPool, reFormatDedustPoolList } from "@/utils/pool";
+import { TONToken } from "@/utils/token";
 
 import { getBalance, getBalances } from "@/services/ton.services";
-import { getDedustPools } from "@/services/dedust.services";
-import { getStonfiPools } from "@/services/stonfi.services";
+import { getStonfiPool } from "@/services/stonfi.services";
 
 import { IContent, IPool, IToken, ITokenSelectorHook, MappedBalance, MappedToken, MappedTokenPair } from "@/interfaces/interface";
+import { getDedustPool } from "@/services/swap/dedust";
 
-interface IPairAddress {
-    primary: string,
-    secondary: string
-}
 
 export interface IAccountContext {
     tokens: IToken[];
     secondaryTokens: IToken[];
     getBalance: (address: string) => number;
-    getPair: (addresses: IPairAddress) => IPool;
+    pool: {
+        loading: boolean;
+        data: { data: IPool; swapable: boolean } | null
+    };
     isReady: boolean;
     primarySelector: ITokenSelectorHook;
     secondarySelector: ITokenSelectorHook;
@@ -33,12 +34,9 @@ export const AccountContext = createContext<IAccountContext>({
     tokens: [],
     secondaryTokens: [],
     getBalance: (address: string) => 0,
-    getPair: (addresses) => {
-        return {
-            assets: addresses,
-            dedustReserved: ["", ""],
-            stonfiReserved: ["", ""]
-        }
+    pool: {
+        loading: false,
+        data: null
     },
     isReady: false,
     primarySelector: {
@@ -66,12 +64,12 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
         message: ""
     });
 
-    const [pool, setPool] = useState<IContent<MappedTokenPair>>({
+    const [pool, setPool] = useState<IContent<{ data: IPool; swapable: boolean } | null>>({
         status: "",
         loading: false,
-        content: {},
+        content: null,
         message: ""
-    });
+    })
 
     function getTokenBalance(address?: string): number {
         if (!address) return 0;
@@ -79,17 +77,20 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
         return accountBalance.content[rawAddress]
     }
 
-    function getPair(addresses: { primary: string, secondary: string }): IPool {
-        const primaryTokenPairs = pool.content[addresses.primary];
-        return primaryTokenPairs[addresses.secondary];
-    }
+    const tokens = useMemo(() => {
+        return Token_Data.data as MappedToken
+    }, [Token_Data]);
+
+    const pools = useMemo(() => {
+        return (Pool_Data as any).data as MappedTokenPair
+    }, [Pool_Data]);
 
     //MAP BALANCES IN TOKEN
     const primaryMappedTokens = useMemo((): MappedToken => {
         if (accountBalance.status !== "success")
-            return mappedTokens;
+            return tokens
 
-        const primaryTokens: MappedToken = { ...mappedTokens };
+        const primaryTokens: MappedToken = { ...tokens };
         const tokenWithBalances: MappedToken = {};
         const nativeTokenWithBalances: MappedToken = {};
 
@@ -117,7 +118,7 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
     }, [accountBalance]);
 
     const secondaryMappedTokens = useMemo((): MappedToken => {
-        const primaryTokenPairs = pool.content[primarySelector.token?.address || ""];
+        const primaryTokenPairs = pools[primarySelector.token?.address || ""];
         if (!primaryTokenPairs) return {};
         // Create a set of keys from primaryMappedTokens for faster lookup
         const primaryMappedTokenKeys = new Set(Object.keys(primaryMappedTokens));
@@ -156,41 +157,49 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
         return Object.values(secondaryMappedTokens)
     }, [secondaryMappedTokens]);
 
-    const isPoolLoaded = useMemo(() => {
-        return !pool.loading && pool.status === "success"
-    }, [pool]);
-
     const isBalanceLoaded = useMemo(() => {
         if (!connectionChecked) return false;
         if (!connected) return true;
         return !accountBalance.loading && accountBalance.status === "success";
     }, [connectionChecked, connected, accountBalance])
 
-    const isReady = useMemo(() => {
-        return isBalanceLoaded && isPoolLoaded;
-    }, [isPoolLoaded, isBalanceLoaded]);
-
-    //FETCH POOL DATA
+    //FETCH POOLS DATA
     useEffect(() => {
         if (pool.loading) return;
 
         (async () => {
+            if (!primarySelector.token || !secondarySelector.token) return;
             setPool({
                 ...pool,
+                content: null,
                 loading: true
             });
 
             try {
-                const dedustPoolRes = await getDedustPools();
-                const stonfiPoolRes = await getStonfiPools();
-                //Merge data
-                const reducedDedustPool = reFormatDedustPoolList((dedustPoolRes?.data || []));
-                const mergedPools = mergeStonfiPoolInDedustPool(reducedDedustPool, (stonfiPoolRes.data?.pool_list || []))
+                const dedustPoolRes = await getDedustPool({
+                    from: primarySelector.token,
+                    to: secondarySelector.token
+                })
+                const stonfiPoolRes = await getStonfiPool({
+                    primary: primarySelector.token.address,
+                    secondary: secondarySelector.token.address
+                });
+                const pool: IPool = {
+                    assets: {
+                        primary: primarySelector.token.address,
+                        secondary: secondarySelector.token.address
+                    },
+                    dedustReserved: dedustPoolRes.reserves,
+                    stonfiReserved: stonfiPoolRes.reserves
+                }
 
                 setPool({
                     loading: false,
                     status: "success",
-                    content: mergedPools,
+                    content: {
+                        swapable: dedustPoolRes.swapable || stonfiPoolRes.swapable,
+                        data: pool
+                    },
                     message: ""
                 });
 
@@ -205,11 +214,11 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
 
         })()
 
-    }, [mappedTokens]);
+    }, [primarySelector.token, secondarySelector.token]);
 
     //FETCH BALANCES ON POOL DATA AND WALLET LOAD
     useEffect(() => {
-        if (!rawWalletAddress || !isPoolLoaded || accountBalance.loading) return;
+        if (!rawWalletAddress || accountBalance.loading) return;
         (async () => {
             setBalance({
                 status: "",
@@ -252,15 +261,18 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
             }
         })();
 
-    }, [isPoolLoaded, rawWalletAddress]);
+    }, [rawWalletAddress]);
 
     return (
         <AccountContext.Provider value={{
-            isReady,
+            isReady: isBalanceLoaded,
             tokens: primaryTokens,
             secondaryTokens: secondaryTokens,
             getBalance: getTokenBalance,
-            getPair,
+            pool: {
+                loading: pool.loading,
+                data: pool.content,
+            },
             primarySelector,
             secondarySelector
         }}>

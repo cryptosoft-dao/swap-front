@@ -16,14 +16,14 @@ import { IToken } from "@/interfaces/interface";
 
 interface ISelectorProps {
     selectedToken?: IToken;
-    toggleSelector:() => void;
+    toggleSelector: () => void;
     className?: string;
 }
 
 interface ISearchProps {
     selectToken: (token: IToken) => void;
     tokens: IToken[];
-    active:boolean;
+    active: boolean;
     className?: string;
 }
 
@@ -110,38 +110,40 @@ function Search(props: ISearchProps) {
 
     }, []);
 
-    return <Flex className={`flex-col bg-primary absolute top-0 left-0 p-6 h-full max-w-[480px] ${props.className} ${props.active ? '':'!hidden'}`}>
-        <div className={`flex flex-col gap-3 overflow-hidden`} style={{
-            height: componentVisibility ? '234px' : '0px',
-            transition: "all 0.4s"
-        }}>
-            <SearchInput value={search} handleSearch={(newValue) => setSearch(newValue)} />
-            <Flex className="gap-2 h-fit flex-wrap">
-                {
-                    props.tokens.slice(0, 7).map((token, index) => <SuggestedToken
-                        token={token}
-                        key={index}
-                        select={() => props.selectToken(token)}
-                    />)
-                }
-            </Flex>
-        </div>
-        <h2 className="text_20_700_SFText text-white mb-6">Tokens</h2>
-        <div className="flex-1 overflow-y-auto pb-6" ref={containerRef}>
-            <Grid className="w-full gap-6">
-                {
-                    list.map((token, index) => {
-                        return <ListToken
-                            key={index}
+    return <Flex className={`flex-col bg-primary fixed top-0 left-0 p-6 h-full m-auto z-40 ${props.className} ${props.active ? '' : '!hidden'}`}>
+        <div className="flex flex-col h-full max-w-[480px] mx-auto">
+            <div className={`flex flex-col gap-3 overflow-hidden`} style={{
+                height: componentVisibility ? '234px' : '0px',
+                transition: "all 0.4s"
+            }}>
+                <SearchInput value={search} handleSearch={(newValue) => setSearch(newValue)} />
+                <Flex className="gap-2 h-fit flex-wrap">
+                    {
+                        props.tokens.slice(0, 7).map((token, index) => <SuggestedToken
                             token={token}
+                            key={index}
                             select={() => props.selectToken(token)}
-                        />
-                    })
-                }
-                {loading && <CircularLoader className="mx-auto my-1" />}
-            </Grid>
+                        />)
+                    }
+                </Flex>
+            </div>
+            <h2 className="text_20_700_SFText text-white mb-6">Tokens</h2>
+            <div className="flex-1 pb-6 overflow-y-auto" ref={containerRef}>
+                <div className="w-full grid gap-6">
+                    {
+                        list.map((token, index) => {
+                            return <ListToken
+                                key={index}
+                                token={token}
+                                select={() => props.selectToken(token)}
+                            />
+                        })
+                    }
+                    {loading && <CircularLoader className="mx-auto my-1" />}
+                </div>
+            </div>
+            <Footer />
         </div>
-        <Footer />
     </Flex >
 }
 

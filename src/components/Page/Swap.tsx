@@ -2,7 +2,9 @@
 import { useEffect, useMemo, useState } from "react";
 import Image, { StaticImageData } from "next/image";
 
-import { useTonConnect } from "@/hooks/useTONConnect";
+import { useTonConnect } from "@/hooks/useTConnect";
+import { useTonWeb } from "@/hooks/useTonWeb";
+import { useTonClient } from "@/hooks/useTonClient";
 import useInput from "@/hooks/useInput";
 import useSimulate, { ISimulateArgs } from "@/hooks/useSimulate";
 
@@ -29,6 +31,7 @@ import InfoIcon from "@/assets/icons/info.svg";
 import swapWithStonfi from "@/services/swap/stonfi";
 import swapWithDedust from "@/services/swap/dedust";
 
+import { sleep } from "@/utils/sleep";
 import { calculateReserve, splitOfferAmount } from "@/utils/pool";
 
 import { IReserve, ISlippage } from "@/interfaces/interface";
@@ -50,18 +53,20 @@ function Nav(props: INavProps) {
 
 export default function Home() {
 
-    const { connected, connect, walletAddress, sendTransaction } = useTonConnect();
+    const { connectionChecked, connected, connect, walletAddress, sendTransaction } = useTonConnect();
+    const { provider } = useTonWeb();
+    const { client } = useTonClient();
     const {
         isReady,
         tokens,
         secondaryTokens,
+        pool,
         primarySelector,
         secondarySelector,
         getBalance,
-        getPair
     } = useAccount();
 
-    const sendInput = useInput(0);
+    const sendInput = useInput(-1);
     const [slippage, setSlipage] = useState<ISlippage>({
         type: "default",
         value: 1
@@ -77,6 +82,9 @@ export default function Home() {
     const [modal, setModal] = useState("");
 
     async function swap() {
+        if (!provider || !client)
+            return;
+
         setModal("progress");
         try {
             if (!walletAddress || !primarySelector.token?.address || !secondarySelector?.token?.address) return;
@@ -89,22 +97,36 @@ export default function Home() {
             })
 
             const stonfi_messages = await swapWithStonfi({
+                TON_PROVIDER: provider,
                 SWAP_AMOUNT: stonfiOfferAmount,
                 WALLET_ADDRESS: walletAddress,
                 JETTON0: primarySelector.token,
                 JETTON1: secondarySelector.token
             });
 
-
             const dedust_messages = await swapWithDedust({
+                TON_CLIENT: client,
                 SWAP_AMOUNT: dedustOfferAmount,
                 WALLET_ADDRESS: walletAddress,
                 JETTON0: primarySelector.token,
                 JETTON1: secondarySelector.token
             });
 
+            // Get user's last transaction hash using tonweb
+            const lastTx = (await provider.getTransactions(walletAddress, 1))[0]
+            const lastTxHash = lastTx.transaction_id.hash;
+
+            // Send swap transactions
             const swap_messages = [...stonfi_messages, ...dedust_messages];
             await sendTransaction(swap_messages);
+
+            // Run a loop until user's last tx hash changes
+            var txHash = lastTxHash
+            while (txHash == lastTxHash) {
+                await sleep(1500) // some delay between API calls
+                let tx = (await provider.getTransactions(walletAddress, 1))[0]
+                txHash = tx.transaction_id.hash
+            }
 
         } catch (err) {
             // alert((err as Error).message);
@@ -114,14 +136,10 @@ export default function Home() {
     }
 
     const distributionPlan = useMemo(() => {
-
+        console.log("Distribution plan");
         let reserved: Record<string, IReserve> = {};
-        if (primarySelector.token && secondarySelector.token) {
-            const pair = getPair({
-                primary: primarySelector.token?.address,
-                secondary: secondarySelector.token.address
-            });
-            reserved = calculateReserve(pair);
+        if (pool.data?.data) {
+            reserved = calculateReserve(pool.data?.data);
         }
         const data = Object.values(reserved).sort((a, b) => b.reserve - a.reserve);
         const comp = <p
@@ -138,11 +156,36 @@ export default function Home() {
             reserved,
             comp
         }
-    }, [primarySelector.token, secondarySelector.token]);
+    }, [pool]);
+
+    const receiveBalance = useMemo(() => {
+        const swapRate = simulateData.content?.swapRate || -1;
+        if (sendInput.value < 0 || !sendInput.value) return -1;
+        const askAmount = (sendInput.value * swapRate).toFixed(4);
+        return Number.parseFloat(askAmount);
+    }, [simulateData, sendInput.value]);
+
+    const primaryFieldError = useMemo(() => {
+        const offerAmount = sendInput.value <= 0 ? 0 : sendInput.value;
+        const isBelowMinimum = offerAmount < 0.00000001;
+        if (isBelowMinimum && offerAmount)
+            return "Cannot swap amount less than 0.00000001";
+        const mainBalance = getBalance(primarySelector.token?.address || "");
+        const insufficient = offerAmount > mainBalance ? true : false
+        if (connectionChecked && connected && insufficient)
+            return "Insufficient balance";
+
+        return "";
+    }, [connectionChecked, connected, sendInput.value, primarySelector.token, pool]);
+
+    const secondaryFieldError = useMemo(() => {
+        if (pool.loading || !pool.data) return "";
+        return pool.data.swapable ? "" : "Token not swapable, please select another token";
+    }, [secondarySelector.token, pool]);
 
     const simulateQuery = useMemo(() => {
 
-        const ready = (sendInput.inputEnd && sendInput.value && primarySelector.token && secondarySelector.token) ? true : false;
+        const ready = (sendInput.inputEnd && (sendInput.value > 0) && primarySelector.token && secondarySelector.token && !primaryFieldError && !secondaryFieldError) ? true : false;
         const query: ISimulateArgs = {
             primary: primarySelector.token,
             secondary: secondarySelector.token,
@@ -154,24 +197,19 @@ export default function Home() {
             },
         }
 
-        if (primarySelector.token && secondarySelector.token) {
-            query.pool = getPair({
-                primary: primarySelector.token.address,
-                secondary: secondarySelector.token.address,
-            })
+        if (pool.data?.data) {
+            query.pool = pool.data?.data
         }
 
         return {
             query,
             ready
         }
-    }, [sendInput.inputEnd, primarySelector.token, secondarySelector.token, slippage, distributionPlan.reserved]);
+    }, [sendInput.inputEnd, primarySelector.token, secondarySelector.token, slippage, distributionPlan.reserved, primaryFieldError, secondaryFieldError]);
 
-    const receiveBalance = useMemo(() => {
-        const swapRate = simulateData.content?.swapRate || 0;
-        const askAmount = ((sendInput.value || 0) * swapRate).toFixed(4);
-        return Number.parseFloat(askAmount);
-    }, [simulateData, sendInput.value]);
+    const isDisabled = useMemo(() => {
+        return simulateData.loading || pool.loading;
+    }, [simulateData.loading, pool.loading]);
 
     //INITIALIZE PRIMARY SELECTOR
     useEffect(() => {
@@ -194,7 +232,7 @@ export default function Home() {
     useEffect(() => {
         if (secondarySelector.selector === 'none') return;
         resetSimulator();
-    }, [secondarySelector]);
+    }, [secondarySelector.selector]);
 
     //RESET SWAP ON INPUT
     useEffect(() => {
@@ -210,7 +248,7 @@ export default function Home() {
     }, [simulateQuery]);
 
     return (
-        <Flex className="flex-col h-full">
+        <Flex className="flex-col h-full hide-scroll">
             <div className="flex justify-between">
                 <h2 className=" text-white text_20_700_SFText">Swap</h2>
                 <div className="grid grid-cols-2 gap-2">
@@ -226,8 +264,9 @@ export default function Home() {
                     change={sendInput.handleInput}
                     selectedToken={primarySelector.token}
                     toggleSelector={primarySelector.toggleSelector}
-                    readonly={simulateData.loading}
-                    disabled={simulateData.loading}
+                    readonly={isDisabled}
+                    disabled={isDisabled}
+                    error={primaryFieldError}
                 />
                 <Image src={SwapIcon} alt="swap" className="w-[15px] h-[15px] mx-auto" />
                 <MemoizedReceiveTokenField
@@ -237,19 +276,20 @@ export default function Home() {
                     selectedToken={secondarySelector.token}
                     toggleSelector={secondarySelector.toggleSelector}
                     readonly={true}
-                    disabled={simulateData.loading}
+                    disabled={isDisabled}
+                    error={secondaryFieldError}
                 />
             </Grid>
             {connected ? <PrimaryButton
                 name="Swap"
                 className="my-4"
                 click={swap}
-                disabled={simulateData.loading}
+                disabled={isDisabled}
             /> : <PrimaryButton
                 name={sendInput.value && !connected ? "Connect & Swap" : "Connect"}
                 click={connect}
                 className="my-4"
-                disabled={simulateData.loading}
+                disabled={isDisabled || !pool.data?.swapable}
             />}
             <div className="mb-5">
                 <Flex className="gap-2" click={() => setShow(!show)}>
@@ -259,28 +299,24 @@ export default function Home() {
                 {
                     <Grid className={`gap-5 my-6 ${show ? 'h-auto' : 'h-0'} overflow-hidden`}>
                         <List name="Price" value={`1 ${primarySelector.token?.symbol || ""} ≈ ${simulateData?.content?.swapRate || 0.00} ${secondarySelector?.token?.symbol || ""}`} />
-                        <List name="Price impact" icon={InfoIcon} value={`${simulateData.content?.priceImpact || "0.00"}%`} valueClassName="!text-red" click={() => setModal('info')} />
-                        <List name="Minimum received" icon={InfoIcon} value={`~ ${receiveBalance} ${secondarySelector?.token?.symbol || ""}`} />
                         <List name="Blockchain fee" value={`${simulateData.content?.fees || 0} ${primarySelector.token?.symbol || ""}`} />
-                        <List name="Your economy" value="0.00%" valueClassName="!text-green" />
                         <List
                             name="Distribution Plan"
                             value={distributionPlan.comp}
                         />
-                        <List name="Routes" value={`${primarySelector.token?.symbol || ""} > stTON > ${secondarySelector?.token?.symbol || ""}`} />
                     </Grid>
                 }
             </div>
             <Footer />
             <SettingModal
-                active={modal === "settings" && !simulateData.loading}
+                active={modal === "settings" && !isDisabled}
                 slippage={slippage}
                 submit={(newSlippage) => setSlipage(newSlippage)}
                 close={() => setModal("")}
             />
             <InfoModal active={modal === "info"} close={() => setModal("")} />
             <ProgressModal active={modal === "progress"} />
-            {!isReady && <Loader className="absolute top-0 left-0" />}
+            {!isReady && <Loader className="fixed top-0 left-0" />}
 
             {
                 primarySelector.selector === 'primary' && <MemoizedSearch

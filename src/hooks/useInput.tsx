@@ -22,6 +22,7 @@ export default function useInput<T>(initialValue: T) {
         if (!inputRef.current) return;
         function handleComplete() {
             timeoutRef.current && clearTimeout(timeoutRef.current);
+            if (!value) return;
             timeoutRef.current = setTimeout(() => setInputEnd(true), 900);
         }
         inputRef.current.addEventListener('input', handleComplete);

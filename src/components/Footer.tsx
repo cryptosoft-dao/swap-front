@@ -1,7 +1,7 @@
 import Image from "next/image";
 import { Flex } from "./wrapper";
 
-import { useTonConnect } from "@/hooks/useTONConnect";
+import { useTonConnect } from "@/hooks/useTConnect";
 
 import UserIcon from "@/assets/icons/user-icon.svg";
 import LogoutIcon from "@/assets/icons/logout-icon.svg";

@@ -1,14 +1,57 @@
-import { ISimulate, IToken } from "@/interfaces/interface";
-import { ISimulateRes, IStonfiPoolRes } from "@/interfaces/request";
+import { IToken } from "@/interfaces/interface";
+import {
+  IReserveRes,
+  ISimulateRes,
+  IStonfiPoolRes,
+  IStonfiPoolsRes,
+} from "@/interfaces/request";
 import { ISimulateStonfiData } from "@/interfaces/stonfi";
 
-import { STONFI_APIs } from "@/utils/api.links";
+import { CUSTOM_APIs, STONFI_APIs } from "@/utils/api.links";
 import { get, post } from "@/utils/request";
 
 export async function getStonfiPools() {
   const url = STONFI_APIs.pools;
-  const res = await get<IStonfiPoolRes>({ url });
+  const res = await get<IStonfiPoolsRes>({ url });
   return res;
+}
+
+export async function getStonfiPool({
+  primary,
+  secondary,
+}: {
+  primary: string;
+  secondary: string;
+}): Promise<IReserveRes> {
+  try {
+    const url = CUSTOM_APIs.stonfiPool(primary, secondary);
+    const res = await get<IStonfiPoolRes>({ url });
+
+    if (!res.data || !res.data?.found) {
+      throw { message: "not found" };
+    }
+
+    const reserves = [res.data.pool.reserve0, res.data.pool.reserve1];
+    const swapable = reserves.reduce(
+      (totalRes, curRes) => totalRes + Number(curRes),
+      0
+    )
+      ? true
+      : false;
+
+    return {
+      swapable,
+      reserves: (res.data.inverted ? reserves.reverse() : reserves) as [
+        string,
+        string
+      ],
+    };
+  } catch (err) {
+    return {
+      swapable: false,
+      reserves: ["0", "0"],
+    };
+  }
 }
 
 export async function simulateStonfiSwap(query: {
@@ -26,14 +69,17 @@ export async function simulateStonfiSwap(query: {
     });
     const res = await post<ISimulateStonfiData>({ url });
     if (!res.data) throw { message: "Something went wrong!" };
+  
     return {
       status: "success",
       data: {
-        fees: Number.parseInt(res.data.fee_units) / Math.pow(10, query.from.decimals),
+        fees:
+          Number.parseInt(res.data.fee_units) /
+          Math.pow(10, 9),
         swapRate: Number.parseFloat(res.data.swap_rate),
         amountOut:
           Number.parseInt(res.data.ask_units) / Math.pow(10, query.to.decimals),
-        priceImpact:Number.parseFloat(res.data.price_impact)
+        priceImpact: Number.parseFloat(res.data.price_impact),
       },
     };
   } catch (err) {

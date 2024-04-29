@@ -10,10 +10,10 @@ export default function useInfiniteScroll(onEnd: () => void): {
         if (!container) return;
         //setup scroll event
         const handleScroll = () => {
-            const scrolled = Math.round(container.scrollHeight - container.scrollTop);
-            const isEndReached = (scrolled === container.clientHeight ||
-                scrolled - container.clientHeight > 10)
-            if (isEndReached) onEnd();
+            const isEndReached = (container.clientHeight + container.scrollTop) >= container.scrollHeight - 10;
+            if (isEndReached) {
+                onEnd();
+            }
         };
 
         container.addEventListener("scroll", handleScroll);

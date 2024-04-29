@@ -1,6 +1,6 @@
 import { IDedustPool } from "@/interfaces/dedust";
 
-import { TONTokenAddress } from "./tokens/tokens";
+import { TONTokenAddress } from "./token";
 
 import { MappedTokenPair, IPool, IReserve } from "@/interfaces/interface";
 import { IStonfiPool } from "@/interfaces/stonfi";

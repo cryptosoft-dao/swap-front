@@ -11,8 +11,8 @@ interface ISwapFieldProps {
     error?: string;
     inputRef: React.MutableRefObject<HTMLInputElement | null>;
     change?: (value: number) => void;
-    toggleSelector:() => void;
-    disabled?:boolean;
+    toggleSelector: () => void;
+    disabled?: boolean;
 }
 
 interface ITokenFieldProps extends ISwapFieldProps {
@@ -27,7 +27,7 @@ function SwapField(props: ISwapFieldProps) {
         <input
             ref={props.inputRef}
             className="w-full h-fit outline-none bg-transparent text_24_600_SFText placeholder:text-text_primary leading-none text-white"
-            value={!props.value ? "" : props.value}
+            value={props.value < 0 ? "" : props.value}
             readOnly={props.readonly}
             type="number"
             placeholder="0"
@@ -40,8 +40,8 @@ function SwapField(props: ISwapFieldProps) {
     </Flex>
 }
 
-function Label(props: { label: string; className?: string }) {
-    return <span className={`text-text_primary text_12_400_SFText leading-none ${props.className}`}>{props.label}</span>
+function Label(props: { label: string; className?: string; click?: () => void }) {
+    return <span onClick={props.click} className={`text-text_primary text_12_400_SFText leading-none ${props.className}`}>{props.label}</span>
 }
 
 function TokenField(props: ITokenFieldProps) {
@@ -59,7 +59,7 @@ function TokenField(props: ITokenFieldProps) {
                 toggleSelector={props.toggleSelector}
                 disabled={props.disabled}
             />
-             {props.disabled && <div className="absolute top-0 left-0 w-full h-full cursor-not-allowed bg-black/10"></div>}
+            {props.disabled && <div className="absolute top-0 left-0 w-full h-full cursor-not-allowed bg-black/10"></div>}
         </Box>
         {props.error && <Label className="!text-red" label={props.error} />}
     </Flex>
@@ -71,7 +71,7 @@ function SendTokenField(props: ISwapFieldProps) {
         <Label label="You Send" />
         {props.balance ? <div className="flex gap-1">
             <Label label={`${props.balance} ${props.selectedToken?.symbol || ""}`} />
-            <Label label="MAX" className={"!text-blue"} />
+            {props.balance !== props.value && <Label label="MAX" className={"!text-blue"} click={() => props.change && props.change(props.balance)} />}
         </div> : <></>}
     </div>;
 
@@ -93,7 +93,7 @@ function ReceiveTokenField(props: ISwapFieldProps) {
     const inputRef = useRef<HTMLInputElement>(null);
     const LabelNode = <div className="flex justify-between">
         <Label label="You Recieve" />
-        <Label label={props.balance ? `${props.balance} ${props.selectedToken?.symbol || ""}` : ''} />
+        <Label label={props.balance > 0 ? `${props.balance} ${props.selectedToken?.symbol || ""}` : ''} />
     </div>;
 
     return <TokenField

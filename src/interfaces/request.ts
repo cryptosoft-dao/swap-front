@@ -7,7 +7,7 @@ export interface IRequestProps {
 }
 
 export interface IPostRequestProps extends IRequestProps {
-  data?:any
+  data?: any;
 }
 
 export interface IResponse<T> {
@@ -20,11 +20,22 @@ export interface IJettonBalancesRes<T> {
   balances: T;
 }
 
-export interface IStonfiPoolRes {
+export interface IStonfiPoolsRes {
   pool_list: IStonfiPool[];
 }
 
-export interface ISimulateRes  {
+export interface IStonfiPoolRes {
+  found: boolean;
+  inverted: boolean;
+  pool: IStonfiPool;
+}
+
+export interface ISimulateRes {
   status: string;
-  data:ISimulate | null;
+  data: ISimulate | null;
+}
+
+export interface IReserveRes {
+  swapable: boolean;
+  reserves: [string, string];
 }

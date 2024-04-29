@@ -13,28 +13,28 @@ import {
   VaultJetton,
 } from "@dedust/sdk";
 
-import { Message } from "@/hooks/useTONConnect";
-import { JETTON, NATIVE } from "@/utils/tokens/tokens";
-import { IPool, IToken } from "@/interfaces/interface";
+import { Message } from "@/hooks/useTConnect";
+import { NATIVE } from "@/utils/token";
+import { IToken } from "@/interfaces/interface";
 
 import { calculatePriceImpact } from "@/utils/pool";
+import { IDedustPool } from "@/interfaces/dedust";
+import { IReserveRes } from "@/interfaces/request";
 
 export default async function swapWithDedust({
+  TON_CLIENT,
   WALLET_ADDRESS,
   JETTON0,
   JETTON1,
   SWAP_AMOUNT,
 }: {
+  TON_CLIENT: TonClient4;
   WALLET_ADDRESS: string;
   JETTON0: IToken;
   JETTON1: IToken;
   SWAP_AMOUNT: number;
 }) {
-  const tonClient = new TonClient4({
-    endpoint: "https://mainnet-v4.tonhubapi.com",
-  });
-
-  const factory = tonClient.open(
+  const factory = TON_CLIENT.open(
     Factory.createFromAddress(MAINNET_FACTORY_ADDR)
   );
 
@@ -42,12 +42,12 @@ export default async function swapWithDedust({
 
   // Swapping native coin
   if (JETTON0.type == NATIVE) {
-    const tonVault = tonClient.open(await factory.getNativeVault());
+    const tonVault = TON_CLIENT.open(await factory.getNativeVault());
 
     const tonAsset = Asset.native();
     const secondaryAsset = Asset.jetton(Address.parse(JETTON1.address));
 
-    const pool = tonClient.open(
+    const pool = TON_CLIENT.open(
       await factory.getPool(PoolType.VOLATILE, [tonAsset, secondaryAsset])
     );
 
@@ -82,12 +82,6 @@ export default async function swapWithDedust({
       )
       .endCell();
 
-    // await tonVault.sendSwap(sender, {
-    //   poolAddress: pool.address,
-    //   amount: amountIn,
-    //   gasAmount: toNano("0.25"),
-    // });
-
     messages.push({
       address: tonVault.address.toString(),
       amount: (amountIn + gasAmount).toString(),
@@ -97,18 +91,18 @@ export default async function swapWithDedust({
   }
 
   // Swapping jettons
-  const primaryVault = tonClient.open(
+  const primaryVault = TON_CLIENT.open(
     await factory.getJettonVault(Address.parse(JETTON0.address))
   );
 
-  const primaryAsset = tonClient.open(
+  const primaryAsset = TON_CLIENT.open(
     JettonRoot.createFromAddress(Address.parse(JETTON0.address))
   );
-  const secondaryAsset = tonClient.open(
+  const secondaryAsset = TON_CLIENT.open(
     JettonRoot.createFromAddress(Address.parse(JETTON1.address))
   );
 
-  const pool = tonClient.open(
+  const pool = TON_CLIENT.open(
     Pool.createFromAddress(
       await factory.getPoolAddress({
         poolType: PoolType.VOLATILE,
@@ -130,7 +124,7 @@ export default async function swapWithDedust({
     throw new Error(`Vault (${JETTON0.name}) does not exist.`);
   }
 
-  const primaryWallet = tonClient.open(
+  const primaryWallet = TON_CLIENT.open(
     await primaryAsset.getWallet(Address.parse(WALLET_ADDRESS))
   );
 
@@ -146,13 +140,6 @@ export default async function swapWithDedust({
     .storeMaybeRef(VaultJetton.createSwapPayload({ poolAddress: pool.address }))
     .endCell();
 
-  // await primaryWallet.sendTransfer(sender, toNano("0.3"), {
-  //   amount: amountIn,
-  //   destination: scaleVault.address,
-  //   responseAddress: sender.address, // return gas to user
-  //   forwardAmount: toNano("0.25"),
-  //   forwardPayload: VaultJetton.createSwapPayload({ poolAddress }),
-  // });
   messages.push({
     address: toUserFriendlyAddress(primaryWallet.address.toString()),
     amount: amountIn.toString(),
@@ -161,51 +148,48 @@ export default async function swapWithDedust({
   return messages;
 }
 
-// const lastBlock = await tonClient.getLastBlock();
-// const poolState = await tonClient.getAccountLite(
-//   lastBlock.last.seqno,
-//   pool.address
-// );
+export async function getDedustPool(query: {
+  from: IToken;
+  to: IToken;
+}): Promise<IReserveRes> {
+  try {
+    const tonClient = new TonClient4({
+      endpoint: "https://mainnet-v4.tonhubapi.com",
+    });
 
-// if (poolState.account.state.type !== "active") {
-//   throw new Error("Pool is not exist.");
-// }
+    const factory = tonClient.open(
+      Factory.createFromAddress(MAINNET_FACTORY_ADDR)
+    );
 
-// const vaultState = await tonClient.getAccountLite(
-//   lastBlock.last.seqno,
-//   nativeVault.address
-// );
+    const primaryAsset =
+      query.from.type === "native"
+        ? Asset.native()
+        : Asset.jetton(Address.parse(query.from.address));
+    const secondaryAsset = Asset.jetton(Address.parse(query.to.address));
 
-// if (vaultState.account.state.type !== "active") {
-//   throw new Error("Native Vault is not exist.");
-// }
+    const pool = tonClient.open(
+      await factory.getPool(PoolType.VOLATILE, [primaryAsset, secondaryAsset])
+    );
 
-// const amountIn = toNano(SWAP_AMOUNT);
-
-// const { amountOut: expectedAmountOut } = await pool.getEstimatedSwapOut({
-//   assetIn: Asset.native(),
-//   amountIn,
-// });
-
-// Slippage handling (1%)
-// const minAmountOut = (expectedAmountOut * 99) / 100; // expectedAmountOut - 1%
-
-//const sender:Sender = null;
-
-// await nativeVault.sendSwap(sender, {
-//   poolAddress: pool.address,
-//   amount: amountIn,
-//   limit: BigInt(0),
-//   gasAmount: toNano("0.25"),
-// });
+    const reserves = await pool.getReserves();
+    return {
+      swapable: reserves[0] + reserves[1] ? true : false,
+      reserves: reserves.map((rres) => rres.toString()) as [string, string],
+    };
+  } catch (err) {
+    return {
+      swapable: false,
+      reserves: ["0", "0"],
+    };
+  }
+}
 
 export async function simulateDedustSwap(query: {
   from: IToken;
   to: IToken;
   amount: number;
-  reserved: [number,number];
+  reserved: [number, number];
 }) {
-
   try {
     const tonClient = new TonClient4({
       endpoint: "https://mainnet-v4.tonhubapi.com",
@@ -238,13 +222,13 @@ export async function simulateDedustSwap(query: {
     return {
       status: "success",
       data: {
-        fees: Number(tradeFee) / Math.pow(10, query.from.decimals),
+        fees: Number(tradeFee) / Math.pow(10, 9),
         swapRate: receiveAmount / sendAmount,
         amountOut: receiveAmount,
         priceImpact: calculatePriceImpact({
-          offerAssetReserve:query.reserved[0],
-          askAssetReserve:query.reserved[1],
-          offerAmount:query.amount
+          offerAssetReserve: query.reserved[0],
+          askAssetReserve: query.reserved[1],
+          offerAmount: query.amount,
         }),
       },
     };
