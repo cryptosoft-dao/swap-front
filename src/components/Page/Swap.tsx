@@ -294,7 +294,7 @@ export default function Home() {
     }, [webApp, primarySelector.selector, secondarySelector.selector]);
 
     return (
-        <Flex className="flex flex-col h-full">
+        <Flex className="relative flex flex-col h-full">
             <PageWrapper>
                 <Flex className="flex-col hide-scroll">
                     <div className="flex justify-between">

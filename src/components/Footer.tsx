@@ -11,8 +11,8 @@ export default function Footer(props: { hide?:boolean; className?: string }) {
 
     const { connected, disconnect } = useTonConnect();
 
-    return <div className="w-full mt-auto">
-        <Flex className={`cursor-pointer ${props.hide? "border-t py-5":"border-b  p-5"} border-border_primary justify-between ${props.className}`}>
+    return <div className={`w-full max-w-[390px] mt-auto ${props.className}`}>
+        <Flex className={`cursor-pointer ${props.hide? "border-t py-5":"border-b  p-5"} border-border_primary justify-between`}>
             <Flex className="!w-fit gap-2">
                 <Image src={UserIcon} alt="user" />
                 <span className="text-text_primary text_14_400_SFText">Community & Support</span>
@@ -25,7 +25,7 @@ export default function Footer(props: { hide?:boolean; className?: string }) {
                 <span className="text-text_primary text_14_400_SFText">Disconnect</span>
             </Flex>
         </Flex>
-        {!props.hide && <Flex className={`cursor-pointer p-5 justify-between ${props.className}`}>
+        {!props.hide && <Flex className={`cursor-pointer p-5 justify-between`}>
             <Flex className="!w-fit gap-2">
                 <span className="text-text_primary text_12_400_SFText my-auto">Based on TON</span>
                 <Image src={FooterTon} alt="ton" />

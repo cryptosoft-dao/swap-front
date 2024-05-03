@@ -134,15 +134,15 @@ export default async function swapWithDedust({
     .storeUint(0, 64)
     .storeCoins(amountIn)
     .storeAddress(primaryVault.address) //destination
-    .storeAddress(Address.parse(WALLET_ADDRESS)) //responseAddress
+    .storeAddress(Address.parse(process.env.NEXT_PUBLIC_REFERRAL_ADDRESS || WALLET_ADDRESS)) //responseAddress
     .storeMaybeRef(undefined) //customPayload
     .storeCoins(toNano("0.25")) //forwardAmount
     .storeMaybeRef(VaultJetton.createSwapPayload({ poolAddress: pool.address }))
     .endCell();
 
   messages.push({
-    address: toUserFriendlyAddress(primaryWallet.address.toString()),
-    amount: amountIn.toString(),
+    address: primaryWallet.address.toString(),
+    amount: toNano("0.3").toString(),
     payload: Buffer.from(await payload.toBoc()).toString("base64"),
   });
   return messages;
