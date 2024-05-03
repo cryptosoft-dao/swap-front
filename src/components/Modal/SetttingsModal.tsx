@@ -15,7 +15,7 @@ interface IPercentageProps {
 }
 
 function Percentage(props: IPercentageProps) {
-   return <div onClick={props.select} className={`flex border border-border_primary leading-none text-center text-white text_14_500_SFText rounded-[15px] py-2 ${props.selected ? "bg-blue" : ""}`}>
+   return <div onClick={props.select} className={`flex cursor-pointer bg-secondary_50 leading-none text-center text-white text_14_500_SFText rounded-[15px] py-2 ${props.selected ? "!bg-blue" : ""}`}>
       <span className="m-auto">{props.percentage}%</span>
    </div>
 }
@@ -69,11 +69,18 @@ export default function SettingModal(props: {
          </div>
          <Grid className="grid-cols-2 gap-3 mt-4 mb-6">
             <input
-               className="border border-border_primary rounded-[15px] bg-transparent outline-none px-3 py-2 text_14_500_SFText text-white"
+               className="rounded-[15px] bg-secondary_50 outline-none px-3 py-2 text_14_500_SFText text-white"
                placeholder="Custom %"
                type="number"
+               max={100}
                value={customPercentage}
-               onChange={(event) => setCustomPercentage(event.currentTarget.value)}
+               onChange={(event) => {
+                  //Skip for value more than 100
+                  if (Number.parseInt(event.currentTarget.value || "0") > 100) return;
+                  const decimals = `${event.currentTarget.value}`.split(".")[1];
+                  if (decimals && decimals.length >= 8) return;
+                  setCustomPercentage(event.currentTarget.value)
+               }}
             />
             <Grid className="grid-cols-3 gap-3">
                {

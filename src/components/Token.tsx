@@ -19,17 +19,35 @@ export function TokenIcon(props: { icon: string; name: string; }) {
     const [icon, setIcon] = useState<string>(DefaultIcon.src);
 
     useEffect(() => {
-        setIcon(props.icon);
-    }, [props.icon]);
+      setIcon(props.icon);
+    },[props.icon]);
 
-    return <Image
+    return <img
+        src={icon}
+        alt={props.name}
+        className="my-auto w-[24px] h-[24px] rounded-full"
+        onError={
+            () => setIcon(DefaultIcon.src)
+        }
+    />
+    /*props.icon && !icon ? <Image
         width={24}
         height={24}
         className="my-auto w-[24px] h-[24px] rounded-full"
-        src={icon}
+        src={props.icon}
         alt={props.name}
-        onError={() => setIcon(DefaultIcon.src)}
-    />
+        onError={
+            () => setIcon(DefaultIcon.src)
+        }
+        loading='eager'
+    /> : <Image
+        width={24}
+        height={24}
+        className="my-auto w-[24px] h-[24px] rounded-full"
+        src={DefaultIcon}
+        alt={props.name}
+        loading='eager'
+    />*/
 }
 
 export function TokenName(props: { name: string; className?: string }) {
@@ -37,7 +55,7 @@ export function TokenName(props: { name: string; className?: string }) {
 }
 
 export function SuggestedToken(props: ITokenProps) {
-    return <Box className="!w-fit flex p-2 cursor-pointer !h-fit" click={props.select}>
+    return <Box className="flex !w-fit !h-fit p-2 px-[10px] cursor-pointer !border-none !bg-secondary_50" click={props.select}>
         <Flex className="!w-fit m-auto gap-2">
             <TokenIcon icon={props.token.image} name={props.token.name} />
             <TokenName name={props.token.symbol} />
@@ -48,7 +66,7 @@ export function SuggestedToken(props: ITokenProps) {
 export function ListToken(props: ITokenProps) {
     return <Flex className="justify-between cursor-pointer" click={props.select}>
         <Flex className="!w-fit gap-4">
-            <TokenIcon icon={props.token.image} name={props.token.symbol} />
+            <TokenIcon icon={props.token.image} name={props.token.name} />
             <TokenName name={props.token.symbol} />
         </Flex>
         <Flex className="!w-fit gap-2">

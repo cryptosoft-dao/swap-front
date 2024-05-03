@@ -29,14 +29,16 @@ export interface IPool {
   stonfiReserved: [string, string];
 }
 
-
-export type Selector = 'primary' | 'secondary' | 'none'
+export type Selector = "primary" | "secondary" | "none";
+export type Action = "select" | "swap";
 
 export interface ITokenSelectorHook {
   token?: IToken;
-  selectToken: (token?: IToken) => void;
+  selectToken: (token?: IToken, action?: Action) => void;
+  selectTokenAndExit: (token: IToken) => void;
   selector: Selector;
   toggleSelector: () => void;
+  action: Action;
 }
 
 export interface IReserve {

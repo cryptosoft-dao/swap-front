@@ -11,6 +11,7 @@ interface ILabelProps {
 interface IListProps extends ILabelProps, React.PropsWithChildren {
     value: React.ReactNode | string;
     valueClassName?: string;
+    hide?:boolean;
 }
 
 function ListWrapper(props: React.PropsWithChildren) {
@@ -20,7 +21,7 @@ function ListWrapper(props: React.PropsWithChildren) {
 }
 
 export function Label(props: ILabelProps) {
-    return <Flex className={`!w-fit gap-1 my-auto cursor-pointer`} click={props.click}>
+    return <Flex className={`!w-fit gap-1 my-auto cursor-pointer ${props.className}`} click={props.click}>
         <span className={`my-auto text_14_400_SFText text-text_primary leading-none whitespace-nowrap ${props.className}`}>{props.name}</span>
         {props.icon && <Image src={props.icon} alt="chain" className="my-auto" />}
     </Flex>

@@ -1,10 +1,29 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   images: {
-    domains: ["cryptologos.cc", "asset.ston.fi"],
+    remotePatterns: [
+      {
+        protocol: "https",
+        hostname: "cryptologos.cc",
+        port: "",
+        pathname: "/*",
+      },
+      {
+        protocol: "https",
+        hostname: "asset.ston.fi",
+        port: "",
+        pathname: "/**",
+      },
+      {
+        protocol: "https",
+        hostname: "assets.dedust.io",
+        port: "",
+        pathname: "/**",
+      },
+    ],
     dangerouslyAllowSVG: true,
   },
-  reactStrictMode:false
+  reactStrictMode: false,
 };
 
 export default nextConfig;

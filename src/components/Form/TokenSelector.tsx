@@ -1,10 +1,9 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import Image from "next/image";
-
 
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
 
-import { Flex, Grid } from "@/components/wrapper";
+import { Flex } from "@/components/wrapper";
 import SearchInput from "@/components/Form/SearchInput";
 import { SuggestedToken, ListToken, TokenIcon, TokenName } from "@/components/Token";
 import Footer from "@/components/Footer";
@@ -13,6 +12,8 @@ import { CircularLoader, SkeletonLoader } from "@/components/Loader";
 import ArrowUp from "@/assets/icons/down-icon.svg";
 
 import { IToken } from "@/interfaces/interface";
+import useInput from "@/hooks/useInput";
+import { TOP_TOKENS } from "@/utils/token";
 
 interface ISelectorProps {
     selectedToken?: IToken;
@@ -29,7 +30,8 @@ interface ISearchProps {
 
 function Search(props: ISearchProps) {
 
-    const [search, setSearch] = useState("");
+    const searchInput = useInput<string>("", 600);
+    const [search, setSearch] = useState<RegExp | null>(null);
     const [loading, setLoading] = useState(false);
     const [componentVisibility, setComponentVisibility] = useState<boolean>(true);
     const [list, setList] = useState<IToken[]>([]);
@@ -39,7 +41,8 @@ function Search(props: ISearchProps) {
         limit: 15,
         active: true
     })
-    const { containerRef } = useInfiniteScroll(() => {
+
+    const { containerRef, secondaryRef } = useInfiniteScroll(() => {
         setLoading(true);
         query.page = query.page + 1;
         query.skip = query.limit * query.page;
@@ -48,11 +51,9 @@ function Search(props: ISearchProps) {
 
     function filter(token: IToken) {
         if (!search) return true;
-        const lsearch = search.toLocaleLowerCase();
-        const bysymbol = lsearch === token.symbol.toLocaleLowerCase();
-        const byname = lsearch === token.name.toLocaleLowerCase();
-        const byaddress = token.address && lsearch === token.address.toLocaleLowerCase();
-        return bysymbol || byname || byaddress;
+        const bysymbol = token.symbol.match(search);
+        const byaddress = token.address === searchInput.value;
+        return bysymbol || byaddress;
     }
 
     useEffect(() => {
@@ -64,6 +65,15 @@ function Search(props: ISearchProps) {
             setList(searchTokens);
         }
     }, [search]);
+
+    useEffect(() => {
+        if (!searchInput.inputEnd) return;
+        if (searchInput.value) {
+            setSearch(new RegExp(searchInput.value, 'gi'));
+        } else {
+            search && setSearch(null);
+        }
+    }, [searchInput.inputEnd]);
 
     useEffect(() => {
         if (!query.active) {
@@ -110,25 +120,32 @@ function Search(props: ISearchProps) {
 
     }, []);
 
-    return <Flex className={`flex-col bg-primary fixed top-0 left-0 p-6 h-full m-auto z-40 ${props.className} ${props.active ? '' : '!hidden'}`}>
-        <div className="flex flex-col h-full max-w-[480px] mx-auto">
-            <div className={`flex flex-col gap-3 overflow-hidden`} style={{
-                height: componentVisibility ? '234px' : '0px',
-                transition: "all 0.4s"
-            }}>
-                <SearchInput value={search} handleSearch={(newValue) => setSearch(newValue)} />
-                <Flex className="gap-2 h-fit flex-wrap">
+    return <Flex className={`flex-col bg-primary fixed top-0 left-0 p-6 !pb-0 h-full m-auto z-40 ${props.className} ${props.active ? '' : '!hidden'}`}>
+        <div className="flex flex-col h-full w-full max-w-[448px] mx-auto">
+            <div
+                ref={secondaryRef}
+                className={`flex flex-col gap-3 overflow-hidden`}
+                style={{
+                    height: searchInput.value ? "fit-content" : (componentVisibility ? 'fit-content' : '0px'),
+                    marginBottom:searchInput.value ? "0px" : (componentVisibility ? '10px' : '0px'),
+                    transition: "all 0.4s"
+                }}>
+                <SearchInput inputRef={searchInput.ref} value={searchInput.value} handleSearch={searchInput.handleInput} />
+                <Flex className={`gap-2 h-fit flex-wrap ${searchInput.value ? "!hidden" : ""}`}>
                     {
-                        props.tokens.slice(0, 7).map((token, index) => <SuggestedToken
-                            token={token}
-                            key={index}
-                            select={() => props.selectToken(token)}
-                        />)
+                        TOP_TOKENS.map((address, index) => {
+                            const token = props.tokens.find(token => token.address.toLocaleLowerCase() === address.toLocaleLowerCase());
+                            return token ? <SuggestedToken
+                                token={token}
+                                key={index}
+                                select={() => props.selectToken(token)}
+                            />:<></>
+                        })
                     }
                 </Flex>
             </div>
-            <h2 className="text_20_700_SFText text-white mb-6">Tokens</h2>
-            <div className="flex-1 pb-6 overflow-y-auto" ref={containerRef}>
+            <h2 className={`text_20_700_SFText text-white mb-6 ${searchInput.value ? "mt-4" : ""}`}>Tokens</h2>
+            <div className="w-full flex-1 pb-6 overflow-y-auto" ref={containerRef}>
                 <div className="w-full grid gap-6">
                     {
                         list.map((token, index) => {
@@ -142,7 +159,7 @@ function Search(props: ISearchProps) {
                     {loading && <CircularLoader className="mx-auto my-1" />}
                 </div>
             </div>
-            <Footer />
+            <Footer hide={true} className={searchInput.value ? "!hidden" : ""} />
         </div>
     </Flex >
 }

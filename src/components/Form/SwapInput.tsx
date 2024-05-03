@@ -1,4 +1,4 @@
-import React, { useEffect, useRef } from "react";
+import React, { useRef } from "react";
 import { Box, Flex } from "../wrapper";
 import { TokenSelector } from "./TokenSelector";
 import { IToken } from "@/interfaces/interface";
@@ -20,7 +20,6 @@ interface ITokenFieldProps extends ISwapFieldProps {
     error?: string;
 };
 
-
 function SwapField(props: ISwapFieldProps) {
 
     return <Flex className="relative mt-4 mb-1">
@@ -31,6 +30,7 @@ function SwapField(props: ISwapFieldProps) {
             readOnly={props.readonly}
             type="number"
             placeholder="0"
+            step={"0.01"}
             onChange={(event) => props.change && props.change(Number.parseFloat(event.currentTarget.value))}
         />
         <TokenSelector
@@ -46,7 +46,7 @@ function Label(props: { label: string; className?: string; click?: () => void })
 
 function TokenField(props: ITokenFieldProps) {
     return <Flex className="flex-col gap-2">
-        <Box className={`relative w-full px-[10px] py-[10px] bg-secondary ${props.error ? "!border-red" : '!border-none'}`}>
+        <Box className={`relative w-full px-[10px] py-[10px] bg-secondary ${props.error ? "!border-red" : 'border-transparent'}`}>
             {props.label}
             <SwapField
                 value={props.value}
@@ -61,7 +61,7 @@ function TokenField(props: ITokenFieldProps) {
             />
             {props.disabled && <div className="absolute top-0 left-0 z-10 w-full h-full cursor-not-allowed bg-black/10"></div>}
         </Box>
-        {props.error && <Label className="!text-red" label={props.error} />}
+        {props.error && <Label className={`!text-red`} label={props.error} />}
     </Flex>
 }
 
@@ -71,7 +71,12 @@ function SendTokenField(props: ISwapFieldProps) {
         <Label label="You Send" />
         {props.balance ? <div className="flex gap-1">
             <Label label={`${props.balance} ${props.selectedToken?.symbol || ""}`} />
-            {props.balance !== props.value && <Label label="MAX" className={"!text-blue"} click={() => props.change && props.change(props.balance)} />}
+            {props.balance !== props.value && <Label label="MAX" className={"!text-blue cursor-pointer"} click={() => {
+                if (props.change) {
+                    const bal = props.balance.toLocaleString('en-US', { maximumFractionDigits: 9 });
+                    props.change(Number.parseFloat(bal));
+                }
+            }} />}
         </div> : <></>}
     </div>;
 

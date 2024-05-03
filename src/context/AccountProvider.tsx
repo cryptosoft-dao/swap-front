@@ -12,16 +12,15 @@ import { TONToken } from "@/utils/token";
 
 import { getBalance, getBalances } from "@/services/ton.services";
 import { getStonfiPool } from "@/services/stonfi.services";
-
-import { IContent, IPool, IToken, ITokenSelectorHook, MappedBalance, MappedToken, MappedTokenPair } from "@/interfaces/interface";
 import { getDedustPool } from "@/services/swap/dedust";
 
+import { IContent, IPool, IToken, ITokenSelectorHook, MappedBalance, MappedToken, MappedTokenPair } from "@/interfaces/interface";
 
 export interface IAccountContext {
     tokens: IToken[];
     secondaryTokens: IToken[];
     getBalance: (address: string) => number;
-    getToken:(address:string) => IToken | undefined;
+    getToken: (address: string) => IToken | undefined;
     pool: {
         loading: boolean;
         data: { data: IPool; swapable: boolean } | null
@@ -29,13 +28,14 @@ export interface IAccountContext {
     isReady: boolean;
     primarySelector: ITokenSelectorHook;
     secondarySelector: ITokenSelectorHook;
+    closeSelector: () => void;
 }
 
 export const AccountContext = createContext<IAccountContext>({
     tokens: [],
     secondaryTokens: [],
     getBalance: (address: string) => 0,
-    getToken:(address:string)=>undefined,
+    getToken: (address: string) => undefined,
     pool: {
         loading: false,
         data: null
@@ -43,14 +43,19 @@ export const AccountContext = createContext<IAccountContext>({
     isReady: false,
     primarySelector: {
         selectToken: (token) => { },
+        selectTokenAndExit: (token) => { },
         selector: 'primary',
-        toggleSelector: () => { }
+        toggleSelector: () => { },
+        action: 'select'
     },
     secondarySelector: {
         selectToken: (token) => { },
+        selectTokenAndExit: (token) => { },
         selector: 'secondary',
-        toggleSelector: () => { }
-    }
+        toggleSelector: () => { },
+        action: 'select'
+    },
+    closeSelector: () => { }
 });
 
 export const AccountProvider = (props: React.PropsWithChildren) => {
@@ -79,9 +84,20 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
         return accountBalance.content[rawAddress]
     }
 
-    function getToken(address:string) {
+    function getToken(address: string) {
         return secondaryTokens.find(token => token.address === address);
-    } 
+    }
+
+    function closeSelector() {
+        if (primarySelector.selector !== "none") {
+            primarySelector.toggleSelector();
+            return;
+        }
+        if (secondarySelector.selector !== "none") {
+            secondarySelector.toggleSelector();
+            return;
+        }
+    }
 
     const tokens = useMemo(() => {
         return Token_Data.data as MappedToken
@@ -104,10 +120,12 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
             if (!primaryTokens[address]) continue;
             //Copy token
             const token = { ...primaryTokens[address] }
+
+            token.balance = accountBalance.content[address];
+            if (!token.balance) continue;
             //Delete token from list
             delete primaryTokens[address];
             //Update balance
-            token.balance = accountBalance.content[address];
             if (token.type === "native") {
                 nativeTokenWithBalances[address] = token;
             } else {
@@ -124,10 +142,12 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
     }, [accountBalance]);
 
     const secondaryMappedTokens = useMemo((): MappedToken => {
+
         const primaryTokenPairs = pools[primarySelector.token?.address || ""];
         if (!primaryTokenPairs) return {};
         // Create a set of keys from primaryMappedTokens for faster lookup
         const primaryMappedTokenKeys = new Set(Object.keys(primaryMappedTokens));
+        const nativeToken:MappedToken = {};
         const secondaryTokens: MappedToken = {};
         const tokenWithBalances: MappedToken = {};
         const nativeTokenWithBalances: MappedToken = {};
@@ -144,15 +164,21 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
                     tokenWithBalances[rawAddress] = token;
                 }
             } else {
-                secondaryTokens[rawAddress] = token;
+                if (token.type === "native") {
+                   nativeToken[rawAddress] = token;
+                }else{
+                    secondaryTokens[rawAddress] = token
+                }
             }
         }
 
         return {
             ...nativeTokenWithBalances,
+            ...nativeToken,
             ...tokenWithBalances,
             ...secondaryTokens
         }
+
     }, [primarySelector.token]);
 
     const primaryTokens = useMemo(() => {
@@ -160,7 +186,7 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
     }, [primaryMappedTokens]);
 
     const secondaryTokens = useMemo(() => {
-        return Object.values(secondaryMappedTokens)
+        return Object.values(secondaryMappedTokens);
     }, [secondaryMappedTokens]);
 
     const isBalanceLoaded = useMemo(() => {
@@ -281,7 +307,8 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
                 data: pool.content,
             },
             primarySelector,
-            secondarySelector
+            secondarySelector,
+            closeSelector
         }}>
             {props.children}
         </AccountContext.Provider>

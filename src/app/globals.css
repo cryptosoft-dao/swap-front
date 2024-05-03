@@ -28,6 +28,7 @@ body {
 
   *::-webkit-scrollbar {
     display: none;
+    scroll-behavior: smooth;
   }
 
   .text_14_400_Inter {
@@ -96,6 +97,7 @@ body {
     width: 25px;
     height: 25px;
   }
+
   .lds-ring div {
     box-sizing: border-box;
     display: block;
@@ -107,6 +109,18 @@ body {
     animation: lds-ring 1.2s cubic-bezier(0.5, 0, 0.5, 1) infinite;
     border-color: white transparent transparent transparent;
   }
+
+  .lds-ring-mini {
+    width:15px !important;
+    height:15px !important;
+    margin: auto 0;
+  }
+
+  .lds-ring-mini div {
+    width: 13px !important;
+    height: 13px !important;
+  }
+
   .lds-ring div:nth-child(1) {
     animation-delay: -0.45s;
   }

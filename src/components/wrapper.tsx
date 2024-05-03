@@ -3,13 +3,13 @@ interface IWrapperProps extends React.PropsWithChildren {
     click?: () => void;
 }
 export function PageWrapper(props: IWrapperProps) {
-    return <div className={`relative flex flex-col w-full h-full p-6 max-w-[480px] bg-primary ${props.className || ""}`}>
+    return <div className={`relative flex flex-col w-full h-full p-6 !pb-0 max-w-[480px] bg-primary ${props.className || ""}`}>
         {props.children}
     </div>
 }
 
 export function Box(props: IWrapperProps) {
-    return <div onClick={props.click} className={`w-full border border-border_primary rounded-[10px] ${props.className || ""}`}>
+    return <div onClick={props.click} className={`w-full border border-border_primary rounded-[13px] ${props.className || ""}`}>
         {props.children}
     </div>
 }

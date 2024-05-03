@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useMemo } from "react";
 
-export default function useInput<T>(initialValue: T) {
+export default function useInput<T>(initialValue: T, initialTimeoutMS?:number) {
 
     const [value, setValue] = useState<T>(initialValue);
     const [inputEnd, setInputEnd] = useState(true);
@@ -12,6 +12,10 @@ export default function useInput<T>(initialValue: T) {
         setValue(newValue);
     }
 
+    function handleInputEnd(end:boolean) {
+        setInputEnd(end);
+    }
+
     //Reset
     useEffect(() => {
         if (inputEnd === false || !value) return;
@@ -21,9 +25,9 @@ export default function useInput<T>(initialValue: T) {
     useEffect(() => {
         if (!inputRef.current) return;
         function handleComplete() {
+            console.log("keep changing")
             timeoutRef.current && clearTimeout(timeoutRef.current);
-            if (!value) return;
-            timeoutRef.current = setTimeout(() => setInputEnd(true), 900);
+            timeoutRef.current = setTimeout(() => setInputEnd(true), initialTimeoutMS || 900);
         }
         inputRef.current.addEventListener('input', handleComplete);
         return () => {
@@ -40,6 +44,7 @@ export default function useInput<T>(initialValue: T) {
             value,
             inputEnd,
             handleInput,
+            handleInputEnd,
             ref: inputRef
         }
     }, [value, inputEnd, handleInput, inputRef])

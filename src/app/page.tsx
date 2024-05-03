@@ -1,3 +1,5 @@
+"use client"
+
 import { Suspense, lazy } from "react";
 import Loader from "@/components/Loader";
 
