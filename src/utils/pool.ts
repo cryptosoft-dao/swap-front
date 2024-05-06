@@ -4,7 +4,7 @@ import { TONTokenAddress } from "./token";
 
 import { MappedTokenPair, IPool, IReserve } from "@/interfaces/interface";
 import { IStonfiPool } from "@/interfaces/stonfi";
-import { percentage } from "./math";
+import { limitDecimals, percentage } from "./math";
 
 export function reFormatDedustPoolList(
   poolList: IDedustPool[]
@@ -109,18 +109,22 @@ export function calculateReserve(pair: IPool) {
   ].map(Number.parseFloat);
 
   const totalReserved = dedustReserved + stonfiReserved;
-
+  const stonfiPercentage = limitDecimals(
+    percentage(totalReserved, stonfiReserved),
+    3
+  );
+  const dedustPercentage = limitDecimals(100 - stonfiPercentage, 3);
   //Calculate Percentage and sort
   const reserved: Record<string, IReserve> = {
     dedust: {
       platform: "DeDust.io",
       name: "dedust",
-      reserve: Math.round(percentage(totalReserved, dedustReserved)),
+      reserve: dedustPercentage,
     },
     stonfi: {
       platform: "Ston.fi",
       name: "stonfi",
-      reserve: Math.round(percentage(totalReserved, stonfiReserved)),
+      reserve: stonfiPercentage,
     },
   };
 
@@ -151,7 +155,7 @@ export function splitOfferAmount(args: {
   stonfiOfferAmount: number;
 } {
   return {
-    dedustOfferAmount: (args.dedustReserve / 100) * args.offerAmount,
-    stonfiOfferAmount: (args.stonfiReserve / 100) * args.offerAmount,
+    dedustOfferAmount: limitDecimals((args.dedustReserve / 100) * args.offerAmount,9),
+    stonfiOfferAmount: limitDecimals((args.stonfiReserve / 100) * args.offerAmount,9),
   };
 }

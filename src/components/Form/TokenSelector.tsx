@@ -127,7 +127,7 @@ function Search(props: ISearchProps) {
                 className={`flex flex-col gap-3 overflow-hidden`}
                 style={{
                     height: searchInput.value ? "fit-content" : (componentVisibility ? 'fit-content' : '0px'),
-                    marginBottom:searchInput.value ? "0px" : (componentVisibility ? '10px' : '0px'),
+                    marginBottom: searchInput.value ? "0px" : (componentVisibility ? '10px' : '0px'),
                     transition: "all 0.4s"
                 }}>
                 <SearchInput inputRef={searchInput.ref} value={searchInput.value} handleSearch={searchInput.handleInput} />
@@ -139,7 +139,7 @@ function Search(props: ISearchProps) {
                                 token={token}
                                 key={index}
                                 select={() => props.selectToken(token)}
-                            />:<></>
+                            /> : <></>
                         })
                     }
                 </Flex>
@@ -159,7 +159,7 @@ function Search(props: ISearchProps) {
                     {loading && <CircularLoader className="mx-auto my-1" />}
                 </div>
             </div>
-            <Footer hide={true} className={searchInput.value ? "!hidden" : ""} />
+            <Footer hide={true} className={searchInput.value ? "!hidden" : "mt-auto"} />
         </div>
     </Flex >
 }

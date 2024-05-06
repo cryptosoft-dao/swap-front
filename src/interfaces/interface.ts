@@ -39,6 +39,7 @@ export interface ITokenSelectorHook {
   selector: Selector;
   toggleSelector: () => void;
   action: Action;
+  selectAction:(action:Action) => void;
 }
 
 export interface IReserve {

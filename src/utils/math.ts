@@ -3,6 +3,28 @@ export function putDecimal(number: number, decimalPlace: number) {
 }
 
 export function percentage(total: number, part: number) {
-  if(part === 0) return 0;
-  return (part / total) * 100
+  if (part === 0) return 0;
+  return (part / total) * 100;
+}
+
+export function limitDecimals(number: number, limit: number) {
+  return Number.parseFloat(number.toFixed(limit));
+}
+
+export function normalizeNumber(number: number): number {
+  let bal = number.toLocaleString("en-US", { maximumFractionDigits: 9 });
+  if (bal.includes(",")) bal = bal.replaceAll(",", "");
+  return Number.parseFloat(bal);
+}
+
+export function convertTextToNumberInput(value: string) {
+  if (value) {
+    const splittedValue = value
+      .replace(/[^0-9,.]/g, "")
+      .replace(",", ".")
+      .split(".");
+    if (splittedValue.length > 2) splittedValue.pop();
+    value = splittedValue.join(".");
+  }
+  return value;
 }

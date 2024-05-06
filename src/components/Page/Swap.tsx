@@ -1,6 +1,8 @@
 "use client";
-import { useEffect, useMemo, useState } from "react";
+import { Fragment, useEffect, useMemo, useState } from "react";
 import Image, { StaticImageData } from "next/image";
+
+import { toNano } from "@ton/core";
 
 import { useTonConnect } from "@/hooks/useTConnect";
 import { useTonWeb } from "@/hooks/useTonWeb";
@@ -35,6 +37,7 @@ import { calculateReserve, splitOfferAmount } from "@/utils/pool";
 
 import { IReserve, ISlippage } from "@/interfaces/interface";
 import { useTelegram } from "@/context/TelegramProvider";
+import { normalizeNumber } from "@/utils/math";
 
 interface INavProps {
     icon: StaticImageData;
@@ -69,7 +72,7 @@ export default function Home() {
         getBalance,
     } = useAccount();
 
-    const sendInput = useInput(-1);
+    const sendInput = useInput<string>('-1');
     const [slippage, setSlipage] = useState<ISlippage>({
         type: "default",
         value: 1
@@ -96,7 +99,7 @@ export default function Home() {
         primarySelector.selectToken(secondary, 'swap');
         secondarySelector.selectToken(primary);
         //Set secondary balance into primary
-        sendInput.handleInput(receiveBalance);
+        sendInput.handleInput(`${receiveBalance}`);
     }
 
     async function swap() {
@@ -119,7 +122,7 @@ export default function Home() {
 
             const { stonfi, dedust } = distributionPlan.reserved;
             const { dedustOfferAmount, stonfiOfferAmount } = splitOfferAmount({
-                offerAmount: sendInput.value,
+                offerAmount: sendInput.getNumberValue(),
                 dedustReserve: dedust?.reserve || 0,
                 stonfiReserve: stonfi?.reserve || 0
             })
@@ -140,12 +143,17 @@ export default function Home() {
                 JETTON1: secondarySelector.token
             }) : [];
 
+            const fee_messages = (process.env.NEXT_PUBLIC_REFERRAL_ADDRESS && process.env.NEXT_PUBLIC_FEE) ? [{
+                address: process.env.NEXT_PUBLIC_REFERRAL_ADDRESS,
+                amount: toNano(process.env.NEXT_PUBLIC_FEE).toString(),
+            }] : [];
+
             // Get user's last transaction hash using tonweb
             const lastTx = (await provider.getTransactions(walletAddress, 1))[0]
             const lastTxHash = lastTx.transaction_id.hash;
 
             // Send swap transactions
-            const swap_messages = [...stonfi_messages, ...dedust_messages];
+            const swap_messages = [...stonfi_messages, ...dedust_messages, ...fee_messages];
             await sendTransaction(swap_messages);
 
             // Run a loop until user's last tx hash changes
@@ -167,7 +175,7 @@ export default function Home() {
         let reserved: Record<string, IReserve> = {};
         let loaded = false;
         if (pool.data?.data) {
-            reserved = calculateReserve(pool.data?.data);
+            reserved = calculateReserve(pool.data.data);
             loaded = true;
         }
         const data = Object.values(reserved).sort((a, b) => b.reserve - a.reserve);
@@ -193,14 +201,14 @@ export default function Home() {
     }, [pool]);
 
     const receiveBalance = useMemo(() => {
-        const swapRate = simulateData.content?.swapRate || -1;
-        if (sendInput.value < 0 || !sendInput.value) return -1;
-        const askAmount = (sendInput.value * swapRate).toFixed(4);
-        return Number.parseFloat(askAmount);
-    }, [simulateData, sendInput.value]);
+        const swapRate = simulateData.content?.swapRate || 0;
+        if (sendInput.getNumberValue() < 0 || !sendInput.getNumberValue()) return -1;
+        const askAmount = (sendInput.getNumberValue() * swapRate);
+        return askAmount <= 0 ? -1 : Number.parseFloat(askAmount.toFixed(5));
+    }, [simulateData, sendInput.getNumberValue()]);
 
     const primaryFieldError = useMemo(() => {
-        const offerAmount = sendInput.value <= 0 ? 0 : sendInput.value;
+        const offerAmount = sendInput.getNumberValue() <= 0 ? 0 : sendInput.getNumberValue();
         const isBelowMinimum = offerAmount < 0.00000001;
         if (isBelowMinimum && offerAmount)
             return "Cannot swap amount less than 0.00000001";
@@ -210,7 +218,7 @@ export default function Home() {
             return "Insufficient balance";
 
         return "";
-    }, [connectionChecked, connected, sendInput.value, primarySelector.token]);
+    }, [connectionChecked, connected, sendInput.getNumberValue(), primarySelector.token]);
 
     const secondaryFieldError = useMemo(() => {
         if (pool.loading || !pool.data) return "";
@@ -218,12 +226,12 @@ export default function Home() {
     }, [pool]);
 
     const simulateQuery = useMemo(() => {
-        const ready = (sendInput.inputEnd && (sendInput.value > 0) && primarySelector.token && secondarySelector.token && distributionPlan.loaded) ? true : false;
+        const ready = (sendInput.inputEnd && (sendInput.getNumberValue() > 0) && primarySelector.token && secondarySelector.token && distributionPlan.loaded) ? true : false;
         const query: ISimulateArgs = {
             primary: primarySelector.token,
             secondary: secondarySelector.token,
             slippage: slippage.value / 100,
-            amount: sendInput.value * Math.pow(10, primarySelector.token?.decimals || 9),
+            amount: sendInput.getNumberValue() * Math.pow(10, primarySelector.token?.decimals || 9),
             reserved: {
                 stonfi: distributionPlan.reserved.stonfi?.reserve || 0,
                 dedust: distributionPlan.reserved.dedust?.reserve || 0
@@ -259,15 +267,24 @@ export default function Home() {
         secondarySelector.selectToken(selectedToken)
     }, [secondaryTokens]);
 
-    //RESET SWAP ON INPUT
+    //RESET SIMULATOR ON INPUT ENDED
     useEffect(() => {
-        const balance = (primarySelector.token?.balance || getBalance(primarySelector.token?.address || "") || 0)
-        if (sendInput.value === balance) {
+        if (sendInput.inputEnd) return;
+        const balance = (primarySelector.token?.balance || getBalance(primarySelector.token?.address || "") || 0);
+        if (sendInput.getNumberValue() === balance || primarySelector.action === "swap") {
+            resetSimulator();
             sendInput.handleInputEnd(true);
-            return;
+            //Reset selection after disabling input it is only for direct input update
+            if (primarySelector.action === "swap") {
+                primarySelector.selectAction('select');
+            }
         }
+    }, [sendInput.inputEnd]);
 
-        resetSimulator();
+    //RESET TIMER ON INPUT VALUE
+    useEffect(() => {
+        if (sendInput.value !== '') return;
+        resetTimer();
     }, [sendInput.value]);
 
     //INITIALIZE SWAP SIMULATOR FOR NEW DATA
@@ -294,8 +311,8 @@ export default function Home() {
     }, [webApp, primarySelector.selector, secondarySelector.selector]);
 
     return (
-        <Flex className="relative flex flex-col h-full">
-            <PageWrapper>
+        <Flex className="!block flex-col">
+            <PageWrapper className="!overflow-y-auto">
                 <Flex className="flex-col hide-scroll">
                     <div className="flex justify-between">
                         <h2 className=" text-white text_20_700_SFText">Swap</h2>
@@ -314,7 +331,7 @@ export default function Home() {
                             inputRef={sendInput.ref}
                             value={sendInput.value}
                             balance={getBalance(primarySelector.token?.address || "")}
-                            change={sendInput.handleInput}
+                            change={(value) => sendInput.handleInput(`${value}`)}
                             selectedToken={primarySelector.token}
                             toggleSelector={() => {
                                 if (isDisabled) return;
@@ -345,17 +362,17 @@ export default function Home() {
                         name={modal === "progress" ? <CircularLoader className="!w-fit m-auto" /> : "Swap"}
                         className={`my-4 ${modal === "progress" ? '!pt-3 pb-1' : ''}`}
                         click={swap}
-                        disabled={isDisabled || sendInput.value <= 0}
+                        disabled={isDisabled || sendInput.getNumberValue() <= 0}
                     /> : <PrimaryButton
-                        name={sendInput.value && !connected ? "Connect & Swap" : "Connect"}
+                        name={sendInput.getNumberValue() && !connected ? "Connect & Swap" : "Connect"}
                         click={connect}
                         className="my-4"
                         disabled={isDisabled}
                     />}
-                    <div className="mb-5">
+                    <div className="mb-[100px]">
                         <Flex className="gap-2 cursor-pointer" click={() => setShow(!show)}>
                             <span className="text_14_400_SFText text-text_primary leading-[16px]">Swap details</span>
-                            {simulateData.loading ? <CircularLoader className="lds-ring-mini"/> :<img src={show ? UpIcon.src : DownIcon.src} alt="arrow-down" className={`my-auto`} />}
+                            {simulateData.loading ? <CircularLoader className="lds-ring-mini" /> : <img src={show ? UpIcon.src : DownIcon.src} alt="arrow-down" className={`my-auto`} />}
                         </Flex>
 
                         <Grid className={`gap-5 my-6 ${show ? 'h-auto' : 'h-0'} overflow-hidden`}>
@@ -394,6 +411,7 @@ export default function Home() {
                     }
                 </Flex>
             </PageWrapper>
+
             <Footer />
             <SettingModal
                 active={modal === "settings" && !isDisabled}

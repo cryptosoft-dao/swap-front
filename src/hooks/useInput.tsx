@@ -1,6 +1,6 @@
 import { useRef, useState, useEffect, useMemo } from "react";
 
-export default function useInput<T>(initialValue: T, initialTimeoutMS?:number) {
+export default function useInput<T>(initialValue: T, initialTimeoutMS?: number) {
 
     const [value, setValue] = useState<T>(initialValue);
     const [inputEnd, setInputEnd] = useState(true);
@@ -12,15 +12,25 @@ export default function useInput<T>(initialValue: T, initialTimeoutMS?:number) {
         setValue(newValue);
     }
 
-    function handleInputEnd(end:boolean) {
+    function handleInputEnd(end: boolean) {
         setInputEnd(end);
+    }
+
+    function getNumberValue(): number {
+        return Number.parseFloat(`${value}`);
     }
 
     //Reset
     useEffect(() => {
-        if (inputEnd === false || !value) return;
+        console.log(`Value changed: ${value}`);
+        console.log(inputEnd === false || value === '');
+        if (inputEnd === false || value === '') return;
         setInputEnd(false);
     }, [value]);
+
+    useEffect(() => {
+      console.log(`Input End: ${inputEnd}`);
+    },[inputEnd]);
 
     useEffect(() => {
         if (!inputRef.current) return;
@@ -35,14 +45,11 @@ export default function useInput<T>(initialValue: T, initialTimeoutMS?:number) {
         }
     }, []);
 
-    useEffect(() => {
-        console.log(`Input: ${inputEnd ? "Ended" : "NOT ENDED"}`);
-    }, [inputEnd]);
-
     const memoized = useMemo(() => {
         return {
             value,
             inputEnd,
+            getNumberValue,
             handleInput,
             handleInputEnd,
             ref: inputRef

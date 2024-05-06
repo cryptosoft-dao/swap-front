@@ -1,5 +1,5 @@
 import { IToken, ITokenSelectorHook, Selector, Action } from "@/interfaces/interface";
-import { useEffect, useRef, useState } from "react";
+import { useRef, useState } from "react";
 
 export default function useTokenSelector(initialSelector: Selector, initialToken?: IToken): ITokenSelectorHook {
     const [selector, setSelector] = useState<Selector>('none');
@@ -17,6 +17,10 @@ export default function useTokenSelector(initialSelector: Selector, initialToken
         selectToken(token);
     }
 
+    function selectAction(action:Action) {
+        actionRef.current = action;
+    }
+
     const selectToken = (token?: IToken, action?: Action) => {
         actionRef.current = action || 'select';
         setToken(token);
@@ -25,6 +29,7 @@ export default function useTokenSelector(initialSelector: Selector, initialToken
     return {
         token,
         action: actionRef.current,
+        selectAction,
         selectToken,
         selectTokenAndExit,
         selector,

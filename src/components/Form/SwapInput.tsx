@@ -2,17 +2,19 @@ import React, { useRef } from "react";
 import { Box, Flex } from "../wrapper";
 import { TokenSelector } from "./TokenSelector";
 import { IToken } from "@/interfaces/interface";
+import { convertTextToNumberInput, normalizeNumber } from "@/utils/math";
 
 interface ISwapFieldProps {
-    value: number;
+    value: number | string;
     balance: number;
     readonly?: boolean;
     selectedToken?: IToken;
     error?: string;
     inputRef: React.MutableRefObject<HTMLInputElement | null>;
-    change?: (value: number) => void;
     toggleSelector: () => void;
     disabled?: boolean;
+    change?: (value: string | number) => void;
+    type?: string;
 }
 
 interface ITokenFieldProps extends ISwapFieldProps {
@@ -26,12 +28,16 @@ function SwapField(props: ISwapFieldProps) {
         <input
             ref={props.inputRef}
             className="w-full h-fit outline-none bg-transparent text_24_600_SFText placeholder:text-text_primary leading-none text-white"
-            value={props.value < 0 ? "" : props.value}
+            value={Number(props.value) < 0 ? "" : props.value}
             readOnly={props.readonly}
-            type="number"
+            type={props.type || "number"}
             placeholder="0"
             step={"0.01"}
-            onChange={(event) => props.change && props.change(Number.parseFloat(event.currentTarget.value))}
+            onChange={(event) => {
+                if (!props.change) return;
+                let value = convertTextToNumberInput(event.currentTarget.value);
+                props.change(value);
+            }}
         />
         <TokenSelector
             selectedToken={props.selectedToken}
@@ -58,6 +64,7 @@ function TokenField(props: ITokenFieldProps) {
                 error={props.error}
                 toggleSelector={props.toggleSelector}
                 disabled={props.disabled}
+                type={props.type}
             />
             {props.disabled && <div className="absolute top-0 left-0 z-10 w-full h-full cursor-not-allowed bg-black/10"></div>}
         </Box>
@@ -73,8 +80,7 @@ function SendTokenField(props: ISwapFieldProps) {
             <Label label={`${props.balance} ${props.selectedToken?.symbol || ""}`} />
             {props.balance !== props.value && <Label label="MAX" className={"!text-blue cursor-pointer"} click={() => {
                 if (props.change) {
-                    const bal = props.balance.toLocaleString('en-US', { maximumFractionDigits: 9 });
-                    props.change(Number.parseFloat(bal));
+                    props.change(`${normalizeNumber(props.balance) - 0.4}`);
                 }
             }} />}
         </div> : <></>}
@@ -91,6 +97,7 @@ function SendTokenField(props: ISwapFieldProps) {
         error={props.error}
         toggleSelector={props.toggleSelector}
         disabled={props.disabled}
+        type="text"
     />
 }
 
@@ -105,7 +112,7 @@ function ReceiveTokenField(props: ISwapFieldProps) {
         inputRef={inputRef}
         label={LabelNode}
         value={props.value}
-        balance={props.balance}
+        balance={normalizeNumber(props.balance)}
         readonly={props.readonly}
         selectedToken={props.selectedToken}
         error={props.error}

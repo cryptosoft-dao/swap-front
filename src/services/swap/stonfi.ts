@@ -41,7 +41,8 @@ export default async function swapWithStonfi({
       askJettonAddress: JETTON1.address,
       minAskAmount: new TonWeb.utils.BN(1),
       queryId: 12345,
-      referralAddress: process.env.NEXT_PUBLIC_REFERRAL_ADDRESS || WALLET_ADDRESS,
+      // referralAddress: process.env.NEXT_PUBLIC_REFERRAL_ADDRESS || WALLET_ADDRESS,
+      forwardGasAmount: new TonWeb.utils.BN(`${0.25 * 1000000000}`),
     });
 
     messages.push({
@@ -64,7 +65,8 @@ export default async function swapWithStonfi({
     askJettonAddress: JETTON1.type == NATIVE ? PROXY_TON : JETTON1.address,
     minAskAmount: new TonWeb.utils.BN(1),
     queryId: 12345,
-    referralAddress: process.env.NEXT_PUBLIC_REFERRAL_ADDRESS || WALLET_ADDRESS,
+    // referralAddress: process.env.NEXT_PUBLIC_REFERRAL_ADDRESS || WALLET_ADDRESS,
+    forwardGasAmount: new TonWeb.utils.BN(`${0.25 * 1000000000}`),
   });
 
   messages.push({

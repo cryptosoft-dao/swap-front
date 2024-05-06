@@ -73,9 +73,10 @@ export default async function swapWithDedust({
       .storeMaybeRef(null) // next ? Vault_1.Vault.packSwapStep(next) : null
       .storeRef(
         beginCell()
-          .storeUint(0, 32)
+          .storeUint(0, 32)   // deadline
           .storeAddress(null) // recipientAddress
           .storeAddress(null) // referralAddress
+          // .storeAddress(Address.parse(process.env.NEXT_PUBLIC_REFERRAL_ADDRESS || WALLET_ADDRESS)) // referralAddress
           .storeMaybeRef(undefined) // fulfillPayload
           .storeMaybeRef(undefined) // rejectPayload
           .endCell()
@@ -134,7 +135,8 @@ export default async function swapWithDedust({
     .storeUint(0, 64)
     .storeCoins(amountIn)
     .storeAddress(primaryVault.address) //destination
-    .storeAddress(Address.parse(process.env.NEXT_PUBLIC_REFERRAL_ADDRESS || WALLET_ADDRESS)) //responseAddress
+    .storeAddress(null) //responseAddress
+    // .storeAddress(Address.parse(process.env.NEXT_PUBLIC_REFERRAL_ADDRESS || WALLET_ADDRESS)) //responseAddress
     .storeMaybeRef(undefined) //customPayload
     .storeCoins(toNano("0.25")) //forwardAmount
     .storeMaybeRef(VaultJetton.createSwapPayload({ poolAddress: pool.address }))
@@ -165,18 +167,19 @@ export async function getDedustPool(query: {
       query.from.type === "native"
         ? Asset.native()
         : Asset.jetton(Address.parse(query.from.address));
-    const secondaryAsset = Asset.jetton(Address.parse(query.to.address));
+    const secondaryAsset = query.to.type === "native" ? Asset.native() : Asset.jetton(Address.parse(query.to.address));
 
     const pool = tonClient.open(
       await factory.getPool(PoolType.VOLATILE, [primaryAsset, secondaryAsset])
     );
-
+    
     const reserves = await pool.getReserves();
     return {
       swapable: reserves[0] + reserves[1] ? true : false,
       reserves: reserves.map((rres) => rres.toString()) as [string, string],
     };
   } catch (err) {
+    console.log(err);
     return {
       swapable: false,
       reserves: ["0", "0"],

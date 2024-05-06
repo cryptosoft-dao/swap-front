@@ -46,14 +46,16 @@ export const AccountContext = createContext<IAccountContext>({
         selectTokenAndExit: (token) => { },
         selector: 'primary',
         toggleSelector: () => { },
-        action: 'select'
+        action: 'select',
+        selectAction(action) {}
     },
     secondarySelector: {
         selectToken: (token) => { },
         selectTokenAndExit: (token) => { },
         selector: 'secondary',
         toggleSelector: () => { },
-        action: 'select'
+        action: 'select',
+        selectAction(action) {}
     },
     closeSelector: () => { }
 });
@@ -211,7 +213,7 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
                 const dedustPoolRes = await getDedustPool({
                     from: primarySelector.token,
                     to: secondarySelector.token
-                })
+                });
                 const stonfiPoolRes = await getStonfiPool({
                     primary: primarySelector.token.address,
                     secondary: secondarySelector.token.address
