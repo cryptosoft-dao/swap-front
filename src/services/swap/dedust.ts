@@ -40,9 +40,13 @@ export default async function swapWithDedust({
 
   let messages: Message[] = [];
 
-  // Swapping native coin
+  // Swapping Native to Jetton
   if (JETTON0.type == NATIVE) {
     const tonVault = TON_CLIENT.open(await factory.getNativeVault());
+    // Check if vault exits:
+    if ((await tonVault.getReadinessStatus()) !== ReadinessStatus.READY) {
+      throw new Error("Vault (TON) does not exist.");
+    }
 
     const tonAsset = Asset.native();
     const secondaryAsset = Asset.jetton(Address.parse(JETTON1.address));
@@ -50,15 +54,9 @@ export default async function swapWithDedust({
     const pool = TON_CLIENT.open(
       await factory.getPool(PoolType.VOLATILE, [tonAsset, secondaryAsset])
     );
-
     // Check if pool exists:
     if ((await pool.getReadinessStatus()) !== ReadinessStatus.READY) {
       throw new Error(`Pool (TON, ${JETTON1.name}) does not exist.`);
-    }
-
-    // Check if vault exits:
-    if ((await tonVault.getReadinessStatus()) !== ReadinessStatus.READY) {
-      throw new Error("Vault (TON) does not exist.");
     }
 
     const amountIn = toNano(SWAP_AMOUNT);
@@ -91,29 +89,56 @@ export default async function swapWithDedust({
     return messages;
   }
 
-  // Swapping jettons
-  const primaryVault = TON_CLIENT.open(
-    await factory.getJettonVault(Address.parse(JETTON0.address))
-  );
+  // Swapping Jetton to Native
+  if (JETTON1.type == NATIVE) {
+    const primaryVault = TON_CLIENT.open(await factory.getJettonVault(Address.parse(JETTON0.address)));
+    // Check if vault exits:
+    if ((await primaryVault.getReadinessStatus()) !== ReadinessStatus.READY) {
+      throw new Error(`Vault (${JETTON0.name}) does not exist.`);
+    }
+  
+    const primaryAsset = Asset.jetton(Address.parse(JETTON0.address));
+    const tonAsset = Asset.native();
 
-  const primaryAsset = TON_CLIENT.open(
-    JettonRoot.createFromAddress(Address.parse(JETTON0.address))
-  );
-  const secondaryAsset = TON_CLIENT.open(
-    JettonRoot.createFromAddress(Address.parse(JETTON1.address))
-  );
+    const pool = TON_CLIENT.open(
+      await factory.getPool(PoolType.VOLATILE, [tonAsset, primaryAsset])
+    );
+    // Check if pool exists:
+    if ((await pool.getReadinessStatus()) !== ReadinessStatus.READY) {
+      throw new Error(`Pool (${JETTON0.name}, TON) does not exist.`);
+    }
 
-  const pool = TON_CLIENT.open(
-    Pool.createFromAddress(
-      await factory.getPoolAddress({
-        poolType: PoolType.VOLATILE,
-        assets: [
-          Asset.jetton(primaryAsset.address),
-          Asset.jetton(secondaryAsset.address),
-        ],
-      })
-    )
-  );
+    const primaryRoot = TON_CLIENT.open(JettonRoot.createFromAddress(Address.parse(JETTON0.address)))
+    const primaryWallet = TON_CLIENT.open(await primaryRoot.getWallet(Address.parse(WALLET_ADDRESS)));
+  
+    const amountIn = toNano(SWAP_AMOUNT);
+    const payload = beginCell()
+      .storeUint(JettonWallet.TRANSFER, 32)
+      .storeUint(0, 64)
+      .storeCoins(amountIn)
+      .storeAddress(primaryVault.address) //destination
+      .storeAddress(null) //responseAddress
+      // .storeAddress(Address.parse(process.env.NEXT_PUBLIC_REFERRAL_ADDRESS || WALLET_ADDRESS)) //responseAddress
+      .storeMaybeRef(undefined) //customPayload
+      .storeCoins(toNano("0.25")) //forwardAmount
+      .storeMaybeRef(VaultJetton.createSwapPayload({ poolAddress: pool.address }))
+      .endCell();
+  
+    messages.push({
+      address: primaryWallet.address.toString(),
+      amount: toNano("0.3").toString(),
+      payload: Buffer.from(await payload.toBoc()).toString("base64"),
+    });
+    return messages;
+  }
+
+  // Swapping Jetton to Jetton
+  const primaryVault = TON_CLIENT.open(await factory.getJettonVault(Address.parse(JETTON0.address)));
+
+  const primaryAsset = Asset.jetton(Address.parse(JETTON0.address));
+  const secondaryAsset = Asset.jetton(Address.parse(JETTON1.address));;
+
+  const pool = TON_CLIENT.open(await factory.getPool(PoolType.VOLATILE, [primaryAsset, secondaryAsset]));
 
   // Check if pool exists:
   if ((await pool.getReadinessStatus()) !== ReadinessStatus.READY) {
@@ -125,9 +150,8 @@ export default async function swapWithDedust({
     throw new Error(`Vault (${JETTON0.name}) does not exist.`);
   }
 
-  const primaryWallet = TON_CLIENT.open(
-    await primaryAsset.getWallet(Address.parse(WALLET_ADDRESS))
-  );
+  const primaryRoot = TON_CLIENT.open(JettonRoot.createFromAddress(Address.parse(JETTON0.address)))
+  const primaryWallet = TON_CLIENT.open(await primaryRoot.getWallet(Address.parse(WALLET_ADDRESS)));
 
   const amountIn = toNano(SWAP_AMOUNT);
   const payload = beginCell()
