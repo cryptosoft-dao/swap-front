@@ -20,3 +20,7 @@ export const TONToken = {
   balance: 0,
   address: Address.parse(TONTokenAddress).toRawString(),
 };
+
+export function convertAmountIntoBN(amount: number, decimals: number): bigint {
+  return BigInt(parseInt(`${amount * Math.pow(10, decimals)}`)); //parse Int to remove extra decimals
+}

@@ -7,7 +7,7 @@ enum AccountStatus {
 
 export interface INativeBalance {
   address: string;
-  balance: number;
+  balance: number | bigint;
   last_activity: number;
   unix: number;
   status?: AccountStatus[];

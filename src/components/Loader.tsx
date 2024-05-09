@@ -1,16 +1,8 @@
-import Image from "next/image";
-import RocketIcon from "@/assets/icons/AnimatedRocket.gif";
-
 import { Blocks } from "react-loader-spinner";
 
 export default function Loader(props: { className?: string }) {
-    return <div className={`flex z-10 w-full h-full bg-primary ${props.className}`}>
-        {/*<Image
-            width={150}
-            src={RocketIcon}
-            alt="rocket"
-            className="m-auto"
-/>*/}
+    return <div className={`flex z-20 w-full h-full bg-primary ${props.className}`}>
+       
         <Blocks
             height="150"
             width="150"

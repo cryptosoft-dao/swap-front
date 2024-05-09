@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useMemo, useRef, useState } from "react";
 import Image from "next/image";
 
 import useInfiniteScroll from "@/hooks/useInfiniteScroll";
@@ -55,6 +55,10 @@ function Search(props: ISearchProps) {
         const byaddress = token.address === searchInput.value;
         return bysymbol || byaddress;
     }
+
+    const hideOnSearchAction = useMemo(() => {
+        return searchInput.value || searchInput.focused ? true : false
+    }, [searchInput.value, searchInput.focused]);
 
     useEffect(() => {
         if (!search) {
@@ -126,12 +130,12 @@ function Search(props: ISearchProps) {
                 ref={secondaryRef}
                 className={`flex flex-col gap-3 overflow-hidden`}
                 style={{
-                    height: searchInput.value ? "fit-content" : (componentVisibility ? 'fit-content' : '0px'),
-                    marginBottom: searchInput.value ? "0px" : (componentVisibility ? '10px' : '0px'),
+                    height: hideOnSearchAction ? "fit-content" : (componentVisibility ? 'fit-content' : '0px'),
+                    marginBottom: hideOnSearchAction ? "0px" : (componentVisibility ? '10px' : '0px'),
                     transition: "all 0.4s"
                 }}>
                 <SearchInput inputRef={searchInput.ref} value={searchInput.value} handleSearch={searchInput.handleInput} />
-                <Flex className={`gap-2 h-fit flex-wrap ${searchInput.value ? "!hidden" : ""}`}>
+                <Flex className={`gap-2 h-fit flex-wrap ${hideOnSearchAction ? "!hidden" : ""}`}>
                     {
                         TOP_TOKENS.map((address, index) => {
                             const token = props.tokens.find(token => token.address.toLocaleLowerCase() === address.toLocaleLowerCase());
@@ -144,7 +148,7 @@ function Search(props: ISearchProps) {
                     }
                 </Flex>
             </div>
-            <h2 className={`text_20_700_SFText text-white mb-6 ${searchInput.value ? "mt-4" : ""}`}>Tokens</h2>
+            <h2 className={`text_20_700_SFText text-white mb-6 ${hideOnSearchAction ? "mt-4" : ""}`}>Tokens</h2>
             <div className="w-full flex-1 pb-6 overflow-y-auto" ref={containerRef}>
                 <div className="w-full grid gap-6">
                     {
@@ -159,7 +163,7 @@ function Search(props: ISearchProps) {
                     {loading && <CircularLoader className="mx-auto my-1" />}
                 </div>
             </div>
-            <Footer hide={true} className={searchInput.value ? "!hidden" : "mt-auto"} />
+            <Footer hide={true} className={hideOnSearchAction ? "!hidden" : "mt-auto"} />
         </div>
     </Flex >
 }

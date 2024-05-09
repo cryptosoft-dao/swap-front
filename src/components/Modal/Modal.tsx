@@ -19,9 +19,9 @@ function Percentage(props: IPercentageProps) {
 export function InfoModal(props: { close: () => void; active: boolean }) {
     return <ModalBox active={props.active}>
         <div className={`p-6`}>
-            <ModalHead heading="Price impact" close={props.close} />
+            <ModalHead heading="Completed" close={props.close} />
             <div className="mt-6">
-                <p className="text_14_400_SFText leading-[16.71px] text-text_primary block">Your transaction will revert if the price changes unfacorably by more than this percentage.</p>
+                <p className="text_14_400_SFText leading-[16.71px] text-text_primary block">Your transaction completed successfully</p>
             </div>
         </div>
     </ModalBox>

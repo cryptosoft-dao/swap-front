@@ -4,6 +4,7 @@ import { IContent, IPool, ISimulate, IToken, MappedPool } from "@/interfaces/int
 
 import { simulateStonfiSwap } from "@/services/stonfi.services";
 import { simulateDedustSwap } from "@/services/swap/dedust";
+import { limitDecimals } from "@/utils/math";
 
 type Simulate = ISimulate | null
 type SimulateArgs = Record<"stonfi" | "dedust", Simulate>;
@@ -103,7 +104,7 @@ export default function useSimulate() {
             }
 
             const newSimulateData = getAvgSimulatorData(simulateArgs);
-            
+
             //Reset previous interval
             resetTimer();
             timeoutRef.current = setTimeout(async () => {

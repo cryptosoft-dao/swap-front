@@ -1,6 +1,6 @@
 import { IDedustPool } from "@/interfaces/dedust";
 
-import { TONTokenAddress } from "./token";
+import { TONTokenAddress, convertAmountIntoBN } from "./token";
 
 import { MappedTokenPair, IPool, IReserve } from "@/interfaces/interface";
 import { IStonfiPool } from "@/interfaces/stonfi";
@@ -150,12 +150,25 @@ export function splitOfferAmount(args: {
   offerAmount: number;
   dedustReserve: number;
   stonfiReserve: number;
+  decimals: number;
 }): {
-  dedustOfferAmount: number;
-  stonfiOfferAmount: number;
+  dedustOfferAmount: bigint;
+  stonfiOfferAmount: bigint;
 } {
   return {
-    dedustOfferAmount: limitDecimals((args.dedustReserve / 100) * args.offerAmount,9),
-    stonfiOfferAmount: limitDecimals((args.stonfiReserve / 100) * args.offerAmount,9),
+    dedustOfferAmount: convertAmountIntoBN(
+      limitDecimals(
+        (args.dedustReserve / 100) * args.offerAmount,
+        args.decimals
+      ),
+      args.decimals
+    ),
+    stonfiOfferAmount: convertAmountIntoBN(
+      limitDecimals(
+        (args.stonfiReserve / 100) * args.offerAmount,
+        args.decimals
+      ),
+      args.decimals
+    ),
   };
 }

@@ -1,4 +1,5 @@
 import { IToken, ITokenSelectorHook, Selector, Action } from "@/interfaces/interface";
+import { NATIVE } from "@/utils/token";
 import { useRef, useState } from "react";
 
 export default function useTokenSelector(initialSelector: Selector, initialToken?: IToken): ITokenSelectorHook {
@@ -11,21 +12,23 @@ export default function useTokenSelector(initialSelector: Selector, initialToken
         setSelector(cSelector || newSelector);
     }
 
-    function selectTokenAndExit(token:IToken) {
+    function selectTokenAndExit(token: IToken) {
         selector !== "none" && toggleSelector();
         actionRef.current = 'select';
         selectToken(token);
     }
 
-    function selectAction(action:Action) {
+    function selectAction(action: Action) {
         actionRef.current = action;
     }
 
-    const selectToken = (token?: IToken, action?: Action) => {
+    function selectToken(token?: IToken, action?: Action) {
         actionRef.current = action || 'select';
         setToken(token);
     }
 
+    const isNative = () => token?.type === NATIVE;
+    
     return {
         token,
         action: actionRef.current,
@@ -33,6 +36,7 @@ export default function useTokenSelector(initialSelector: Selector, initialToken
         selectToken,
         selectTokenAndExit,
         selector,
-        toggleSelector
+        toggleSelector,
+        isNative
     }
 }

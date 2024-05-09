@@ -3,7 +3,7 @@ import { HttpProvider } from "tonweb/dist/types/providers/http-provider";
 
 import { toUserFriendlyAddress } from "@tonconnect/sdk";
 import { toNano } from "@ton/core";
-import { Router, ROUTER_REVISION, ROUTER_REVISION_ADDRESS } from "@ston-fi/sdk";
+import { DEX, pTON } from "@ston-fi/sdk";
 
 import { Message } from "@/hooks/useTConnect";
 import { NATIVE } from "@/utils/token";
@@ -16,63 +16,78 @@ export default async function swapWithStonfi({
   JETTON1,
   SWAP_AMOUNT,
 }: {
-  TON_PROVIDER:HttpProvider;
+  TON_PROVIDER: HttpProvider;
   WALLET_ADDRESS: string;
   JETTON0: IToken;
   JETTON1: IToken;
-  SWAP_AMOUNT: number;
+  SWAP_AMOUNT: bigint
 }): Promise<Message[]> {
-  const router = new Router(TON_PROVIDER, {
-    revision: ROUTER_REVISION.V1,
-    address: ROUTER_REVISION_ADDRESS.V1,
+  const router = new DEX.v1.Router({
+    tonApiClient: TON_PROVIDER,
   });
 
   let messages: Message[] = [];
-  const PROXY_TON = "EQCM3B12QK1e4yZSf8GtBRT0aLMNyEsBc_DhVfRRtOEffLez";
 
   if (JETTON0.address == JETTON1.address) return [];
 
-  // Swapping TON
+  // Swap TON to JETTON
   if (JETTON0.type == NATIVE) {
-    const tonToJettonTxParams = await router.buildSwapProxyTonTxParams({
+    const txParams = await router.buildSwapTonToJettonTxParams({
       userWalletAddress: WALLET_ADDRESS,
-      proxyTonAddress: PROXY_TON,
-      offerAmount: new TonWeb.utils.BN(`${SWAP_AMOUNT * 1000000000}`),
+      proxyTonAddress: pTON.v1.address,
+      offerAmount: new TonWeb.utils.BN(`${SWAP_AMOUNT}`),
       askJettonAddress: JETTON1.address,
       minAskAmount: new TonWeb.utils.BN(1),
       queryId: 12345,
       // referralAddress: process.env.NEXT_PUBLIC_REFERRAL_ADDRESS || WALLET_ADDRESS,
-      forwardGasAmount: new TonWeb.utils.BN(`${0.25 * 1000000000}`),
+      // forwardGasAmount: new TonWeb.utils.BN(`${0.3 * 1000000000}`),
     });
 
     messages.push({
-      address: toUserFriendlyAddress(tonToJettonTxParams.to.toString()),
-      amount: toNano(
-        TonWeb.utils.fromNano(tonToJettonTxParams.gasAmount)
-      ).toString(),
-      payload: TonWeb.utils.bytesToBase64(
-        await tonToJettonTxParams.payload.toBoc()
-      ),
+      address: txParams.to.toString(),
+      amount: toNano(TonWeb.utils.fromNano(txParams.gasAmount)).toString(),
+      payload: TonWeb.utils.bytesToBase64(await txParams.payload.toBoc()),
     });
     return messages;
   }
 
-  // Swapping Jetton
-  const swapTxParams = await router.buildSwapJettonTxParams({
+  // Swap JETTON to TON
+  if (JETTON1.type == NATIVE) {
+    const txParams = await router.buildSwapJettonToTonTxParams({
+      userWalletAddress: WALLET_ADDRESS,
+      offerJettonAddress: JETTON0.address,
+      offerAmount: new TonWeb.utils.BN(`${SWAP_AMOUNT}`),
+      proxyTonAddress: pTON.v1.address,
+      minAskAmount: new TonWeb.utils.BN("1"),
+      queryId: 12345,
+      // referralAddress: process.env.NEXT_PUBLIC_REFERRAL_ADDRESS || WALLET_ADDRESS,
+      // forwardGasAmount: new TonWeb.utils.BN(`${0.3 * 1000000000}`),
+    });
+    
+    messages.push({
+      address: txParams.to.toString(),
+      amount: toNano(TonWeb.utils.fromNano(txParams.gasAmount)).toString(),
+      payload: TonWeb.utils.bytesToBase64(await txParams.payload.toBoc()),
+    });
+    return messages;
+  }
+
+  // Swap Jetton to Jetton
+  const txParams = await router.buildSwapJettonToJettonTxParams({
     userWalletAddress: WALLET_ADDRESS,
     offerJettonAddress: JETTON0.address,
-    offerAmount: new TonWeb.utils.BN(`${SWAP_AMOUNT * 1000000000}`),
-    askJettonAddress: JETTON1.type == NATIVE ? PROXY_TON : JETTON1.address,
+    offerAmount: new TonWeb.utils.BN(`${SWAP_AMOUNT}`),
+    askJettonAddress: JETTON1.address,
     minAskAmount: new TonWeb.utils.BN(1),
     queryId: 12345,
     // referralAddress: process.env.NEXT_PUBLIC_REFERRAL_ADDRESS || WALLET_ADDRESS,
-    forwardGasAmount: new TonWeb.utils.BN(`${0.25 * 1000000000}`),
+    // forwardGasAmount: new TonWeb.utils.BN(`${0.3 * 1000000000}`),
   });
 
   messages.push({
-    address: toUserFriendlyAddress(swapTxParams.to.toString()),
-    amount: toNano(TonWeb.utils.fromNano(swapTxParams.gasAmount)).toString(),
-    payload: TonWeb.utils.bytesToBase64(await swapTxParams.payload.toBoc()),
+    address: txParams.to.toString(),
+    amount: toNano(TonWeb.utils.fromNano(txParams.gasAmount)).toString(),
+    payload: TonWeb.utils.bytesToBase64(await txParams.payload.toBoc()),
   });
   return messages;
 }

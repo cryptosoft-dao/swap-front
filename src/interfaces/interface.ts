@@ -40,6 +40,7 @@ export interface ITokenSelectorHook {
   toggleSelector: () => void;
   action: Action;
   selectAction:(action:Action) => void;
+  isNative:() => boolean;
 }
 
 export interface IReserve {

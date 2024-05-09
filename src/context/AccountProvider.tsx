@@ -29,6 +29,7 @@ export interface IAccountContext {
     primarySelector: ITokenSelectorHook;
     secondarySelector: ITokenSelectorHook;
     closeSelector: () => void;
+    loadBalances: () => void;
 }
 
 export const AccountContext = createContext<IAccountContext>({
@@ -47,7 +48,8 @@ export const AccountContext = createContext<IAccountContext>({
         selector: 'primary',
         toggleSelector: () => { },
         action: 'select',
-        selectAction(action) {}
+        selectAction(action) { },
+        isNative: () => false
     },
     secondarySelector: {
         selectToken: (token) => { },
@@ -55,9 +57,11 @@ export const AccountContext = createContext<IAccountContext>({
         selector: 'secondary',
         toggleSelector: () => { },
         action: 'select',
-        selectAction(action) {}
+        selectAction(action) { },
+        isNative: () => false
     },
-    closeSelector: () => { }
+    closeSelector: () => { },
+    loadBalances: () => { }
 });
 
 export const AccountProvider = (props: React.PropsWithChildren) => {
@@ -79,6 +83,49 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
         content: null,
         message: ""
     })
+
+    async function loadBalances() {
+        if (!rawWalletAddress) return;
+        setBalance({
+            status: "",
+            loading: true,
+            content: {},
+            message: ""
+        });
+
+        try {
+
+            const balancesRes = await getBalances(rawWalletAddress)
+            if (!balancesRes.data) throw { message: "Not found" }
+            const balanceRes = await getBalance(rawWalletAddress)
+            if (!balanceRes.data) throw { message: "Not found" }
+
+            //Mapp Balances
+            const newBalances: MappedBalance = {};
+            //Map Jettons balances
+            balancesRes.data.balances.forEach(bal => {
+                newBalances[bal.jetton.address] = putDecimal(Number.parseInt(bal.balance), bal.jetton.decimals);
+            })
+            //Map Native balance
+            const { address, decimal } = TONToken
+            newBalances[address] = putDecimal(Number(balanceRes.data.balance), decimal);
+
+            setBalance({
+                status: "success",
+                loading: false,
+                content: newBalances,
+                message: ""
+            });
+
+        } catch (err) {
+            setBalance({
+                status: "fail",
+                loading: false,
+                content: {},
+                message: (err as Error).message
+            });
+        }
+    }
 
     function getTokenBalance(address?: string): number {
         if (!address) return 0;
@@ -149,7 +196,7 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
         if (!primaryTokenPairs) return {};
         // Create a set of keys from primaryMappedTokens for faster lookup
         const primaryMappedTokenKeys = new Set(Object.keys(primaryMappedTokens));
-        const nativeToken:MappedToken = {};
+        const nativeToken: MappedToken = {};
         const secondaryTokens: MappedToken = {};
         const tokenWithBalances: MappedToken = {};
         const nativeTokenWithBalances: MappedToken = {};
@@ -167,8 +214,8 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
                 }
             } else {
                 if (token.type === "native") {
-                   nativeToken[rawAddress] = token;
-                }else{
+                    nativeToken[rawAddress] = token;
+                } else {
                     secondaryTokens[rawAddress] = token
                 }
             }
@@ -254,46 +301,8 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
     useEffect(() => {
         if (!rawWalletAddress || accountBalance.loading) return;
         (async () => {
-            setBalance({
-                status: "",
-                loading: true,
-                content: {},
-                message: ""
-            });
-
-            try {
-
-                const balancesRes = await getBalances(rawWalletAddress)
-                if (!balancesRes.data) throw { message: "Not found" }
-                const balanceRes = await getBalance(rawWalletAddress)
-                if (!balanceRes.data) throw { message: "Not found" }
-
-                //Mapp Balances
-                const newBalances: MappedBalance = {};
-                //Map Jettons balances
-                balancesRes.data.balances.forEach(bal => {
-                    newBalances[bal.jetton.address] = putDecimal(Number.parseInt(bal.balance), bal.jetton.decimals);
-                })
-                //Map Native balance
-                const { address, decimal } = TONToken
-                newBalances[address] = putDecimal(balanceRes.data.balance, decimal);
-
-                setBalance({
-                    status: "success",
-                    loading: false,
-                    content: newBalances,
-                    message: ""
-                });
-
-            } catch (err) {
-                setBalance({
-                    status: "fail",
-                    loading: false,
-                    content: {},
-                    message: (err as Error).message
-                });
-            }
-        })();
+            await loadBalances();
+        })()
 
     }, [rawWalletAddress]);
 
@@ -310,7 +319,8 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
             },
             primarySelector,
             secondarySelector,
-            closeSelector
+            closeSelector,
+            loadBalances
         }}>
             {props.children}
         </AccountContext.Provider>

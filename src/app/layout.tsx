@@ -7,7 +7,6 @@ import { AccountProvider } from "@/context/AccountProvider";
 import "./fonts.css";
 import "./globals.css";
 
-
 const manifestUrl =
   "https://raw.githubusercontent.com/ton-community/tutorials/main/03-client/test/public/tonconnect-manifest.json";
 
@@ -19,12 +18,15 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+      <head>
+        <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+      </head>
       <body>
 
         <TelegramProvider>
           <TonConnectUIProvider manifestUrl={manifestUrl}>
             <AccountProvider>
-                {children}
+              {children}
             </AccountProvider>
           </TonConnectUIProvider>
         </TelegramProvider>

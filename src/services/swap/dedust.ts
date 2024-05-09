@@ -18,7 +18,6 @@ import { NATIVE } from "@/utils/token";
 import { IToken } from "@/interfaces/interface";
 
 import { calculatePriceImpact } from "@/utils/pool";
-import { IDedustPool } from "@/interfaces/dedust";
 import { IReserveRes } from "@/interfaces/request";
 
 export default async function swapWithDedust({
@@ -32,7 +31,7 @@ export default async function swapWithDedust({
   WALLET_ADDRESS: string;
   JETTON0: IToken;
   JETTON1: IToken;
-  SWAP_AMOUNT: number;
+  SWAP_AMOUNT: bigint;
 }) {
   const factory = TON_CLIENT.open(
     Factory.createFromAddress(MAINNET_FACTORY_ADDR)
@@ -40,7 +39,7 @@ export default async function swapWithDedust({
 
   let messages: Message[] = [];
 
-  // Swapping Native to Jetton
+  // Swapp Native to Jetton
   if (JETTON0.type == NATIVE) {
     const tonVault = TON_CLIENT.open(await factory.getNativeVault());
     // Check if vault exits:
@@ -59,7 +58,7 @@ export default async function swapWithDedust({
       throw new Error(`Pool (TON, ${JETTON1.name}) does not exist.`);
     }
 
-    const amountIn = toNano(SWAP_AMOUNT);
+    const amountIn = SWAP_AMOUNT;
     const gasAmount = toNano("0.25");
     const payload = beginCell()
       .storeUint(VaultNative.SWAP, 32)
@@ -89,7 +88,7 @@ export default async function swapWithDedust({
     return messages;
   }
 
-  // Swapping Jetton to Native
+  // Swap Jetton to Native
   if (JETTON1.type == NATIVE) {
     const primaryVault = TON_CLIENT.open(await factory.getJettonVault(Address.parse(JETTON0.address)));
     // Check if vault exits:
@@ -111,7 +110,7 @@ export default async function swapWithDedust({
     const primaryRoot = TON_CLIENT.open(JettonRoot.createFromAddress(Address.parse(JETTON0.address)))
     const primaryWallet = TON_CLIENT.open(await primaryRoot.getWallet(Address.parse(WALLET_ADDRESS)));
   
-    const amountIn = toNano(SWAP_AMOUNT);
+    const amountIn = SWAP_AMOUNT;
     const payload = beginCell()
       .storeUint(JettonWallet.TRANSFER, 32)
       .storeUint(0, 64)
@@ -132,7 +131,7 @@ export default async function swapWithDedust({
     return messages;
   }
 
-  // Swapping Jetton to Jetton
+  // Swap Jetton to Jetton
   const primaryVault = TON_CLIENT.open(await factory.getJettonVault(Address.parse(JETTON0.address)));
 
   const primaryAsset = Asset.jetton(Address.parse(JETTON0.address));
@@ -153,7 +152,7 @@ export default async function swapWithDedust({
   const primaryRoot = TON_CLIENT.open(JettonRoot.createFromAddress(Address.parse(JETTON0.address)))
   const primaryWallet = TON_CLIENT.open(await primaryRoot.getWallet(Address.parse(WALLET_ADDRESS)));
 
-  const amountIn = toNano(SWAP_AMOUNT);
+  const amountIn = SWAP_AMOUNT;
   const payload = beginCell()
     .storeUint(JettonWallet.TRANSFER, 32)
     .storeUint(0, 64)

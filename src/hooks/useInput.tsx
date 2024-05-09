@@ -4,6 +4,7 @@ export default function useInput<T>(initialValue: T, initialTimeoutMS?: number) 
 
     const [value, setValue] = useState<T>(initialValue);
     const [inputEnd, setInputEnd] = useState(true);
+    const [focused, setFocused] = useState(false);
 
     const timeoutRef = useRef<NodeJS.Timeout | null>(null);
     const inputRef = useRef<HTMLInputElement | null>(null);
@@ -22,26 +23,34 @@ export default function useInput<T>(initialValue: T, initialTimeoutMS?: number) 
 
     //Reset
     useEffect(() => {
-        console.log(`Value changed: ${value}`);
-        console.log(inputEnd === false || value === '');
-        if (inputEnd === false || value === '') return;
+        if (value === '' || value === '-1') return;
         setInputEnd(false);
     }, [value]);
 
     useEffect(() => {
-      console.log(`Input End: ${inputEnd}`);
-    },[inputEnd]);
-
-    useEffect(() => {
         if (!inputRef.current) return;
+        function handleFocusIn() {
+            setFocused(true);
+        };
+
+        function handleFocusOut() {
+            setFocused(false);
+        };
         function handleComplete() {
-            console.log("keep changing")
             timeoutRef.current && clearTimeout(timeoutRef.current);
             timeoutRef.current = setTimeout(() => setInputEnd(true), initialTimeoutMS || 900);
+            if (inputRef.current) {
+                inputRef.current.autofocus = false;
+                handleFocusOut();
+            }
         }
         inputRef.current.addEventListener('input', handleComplete);
+        inputRef.current.addEventListener('focusin', handleFocusIn);
+        inputRef.current.addEventListener('focusout', handleFocusOut);
         return () => {
             inputRef.current?.removeEventListener('input', handleComplete);
+            inputRef.current?.removeEventListener('focusin', handleFocusIn);
+            inputRef.current?.removeEventListener('focusout', handleFocusOut);
         }
     }, []);
 
@@ -49,6 +58,7 @@ export default function useInput<T>(initialValue: T, initialTimeoutMS?: number) 
         return {
             value,
             inputEnd,
+            focused,
             getNumberValue,
             handleInput,
             handleInputEnd,

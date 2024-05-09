@@ -1,5 +1,5 @@
 "use client";
-import { Fragment, useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Image, { StaticImageData } from "next/image";
 
 import { toNano } from "@ton/core";
@@ -37,7 +37,7 @@ import { calculateReserve, splitOfferAmount } from "@/utils/pool";
 
 import { IReserve, ISlippage } from "@/interfaces/interface";
 import { useTelegram } from "@/context/TelegramProvider";
-import { normalizeNumber } from "@/utils/math";
+import { limitDecimals } from "@/utils/math";
 
 interface INavProps {
     icon: StaticImageData;
@@ -70,6 +70,7 @@ export default function Home() {
         primarySelector,
         secondarySelector,
         getBalance,
+        loadBalances,
     } = useAccount();
 
     const sendInput = useInput<string>('-1');
@@ -124,7 +125,8 @@ export default function Home() {
             const { dedustOfferAmount, stonfiOfferAmount } = splitOfferAmount({
                 offerAmount: sendInput.getNumberValue(),
                 dedustReserve: dedust?.reserve || 0,
-                stonfiReserve: stonfi?.reserve || 0
+                stonfiReserve: stonfi?.reserve || 0,
+                decimals: primarySelector.token.decimals
             })
 
             const stonfi_messages = stonfiOfferAmount ? await swapWithStonfi({
@@ -157,13 +159,13 @@ export default function Home() {
             await sendTransaction(swap_messages);
 
             // Run a loop until user's last tx hash changes
-            // var txHash = lastTxHash
-            // while (txHash == lastTxHash) {
-            //     await sleep(1500) // some delay between API calls
-            //     let tx = (await provider.getTransactions(walletAddress, 1))[0]
-            //     txHash = tx.transaction_id.hash
-            // }
-
+            var txHash = lastTxHash
+            while (txHash == lastTxHash) {
+                await sleep(1500) // some delay between API calls
+                let tx = (await provider.getTransactions(walletAddress, 1))[0]
+                txHash = tx.transaction_id.hash
+            }
+            setModal("completed");
         } catch (err) {
             // alert((err as Error).message);
             console.error(err);
@@ -275,15 +277,14 @@ export default function Home() {
             resetSimulator();
             sendInput.handleInputEnd(true);
             //Reset selection after disabling input it is only for direct input update
-            if (primarySelector.action === "swap") {
+            if (primarySelector.action === "swap")
                 primarySelector.selectAction('select');
-            }
         }
     }, [sendInput.inputEnd]);
 
     //RESET TIMER ON INPUT VALUE
     useEffect(() => {
-        if (sendInput.value !== '') return;
+        //if (sendInput.value !== '') return;
         resetTimer();
     }, [sendInput.value]);
 
@@ -311,7 +312,7 @@ export default function Home() {
     }, [webApp, primarySelector.selector, secondarySelector.selector]);
 
     return (
-        <Flex className="!block flex-col">
+        <Flex className="h-full flex-col">
             <PageWrapper className="!overflow-y-auto">
                 <Flex className="flex-col hide-scroll">
                     <div className="flex justify-between">
@@ -369,14 +370,14 @@ export default function Home() {
                         className="my-4"
                         disabled={isDisabled}
                     />}
-                    <div className="mb-[100px]">
+                    <div className={sendInput.focused ? "":"mb-[20px]"}>
                         <Flex className="gap-2 cursor-pointer" click={() => setShow(!show)}>
                             <span className="text_14_400_SFText text-text_primary leading-[16px]">Swap details</span>
                             {simulateData.loading ? <CircularLoader className="lds-ring-mini" /> : <img src={show ? UpIcon.src : DownIcon.src} alt="arrow-down" className={`my-auto`} />}
                         </Flex>
 
                         <Grid className={`gap-5 my-6 ${show ? 'h-auto' : 'h-0'} overflow-hidden`}>
-                            <List name="Price" value={`${simulateData?.content?.swapRate ? "1" : ""} ${primarySelector.token?.symbol || ""} ≈ ${simulateData?.content?.swapRate || ""} ${secondarySelector?.token?.symbol || ""}`} />
+                            <List name="Price" value={`${simulateData?.content?.swapRate ? "1" : ""} ${primarySelector.token?.symbol || ""} ≈ ${simulateData?.content?.swapRate ? limitDecimals(simulateData?.content?.swapRate, 9) : ""} ${secondarySelector?.token?.symbol || ""}`} />
                             {/* <List name="Blockchain fee" value={`${simulateData.content?.fees || ""} ${primarySelector.token?.symbol || ""}`} /> */}
                             <List name="Blockchain fee" value={`0.08 - 0.3 TON`} />
                             <List
@@ -412,14 +413,21 @@ export default function Home() {
                 </Flex>
             </PageWrapper>
 
-            <Footer />
+            {sendInput.focused ? <></>:<Footer className={`z-10 mt-auto duration-50 ease-in`} />}
             <SettingModal
                 active={modal === "settings" && !isDisabled}
                 slippage={slippage}
                 submit={(newSlippage) => setSlipage(newSlippage)}
                 close={() => setModal("")}
             />
-            <InfoModal active={modal === "info"} close={() => setModal("")} />
+            <InfoModal
+                active={modal === "completed"}
+                close={() => {
+                    setModal("");
+                    sendInput.handleInput('-1');
+                    loadBalances();
+                }}
+            />
         </Flex>
     );
 }

@@ -1,8 +1,9 @@
-import React, { useRef } from "react";
+import React, { useMemo, useRef } from "react";
 import { Box, Flex } from "../wrapper";
 import { TokenSelector } from "./TokenSelector";
 import { IToken } from "@/interfaces/interface";
-import { convertTextToNumberInput, normalizeNumber } from "@/utils/math";
+import { convertTextToNumberInput, limitDecimals, normalizeNumber } from "@/utils/math";
+import { NATIVE } from "@/utils/token";
 
 interface ISwapFieldProps {
     value: number | string;
@@ -80,15 +81,26 @@ function SendTokenField(props: ISwapFieldProps) {
             <Label label={`${props.balance} ${props.selectedToken?.symbol || ""}`} />
             {props.balance !== props.value && <Label label="MAX" className={"!text-blue cursor-pointer"} click={() => {
                 if (props.change) {
-                    props.change(`${normalizeNumber(props.balance) - 0.4}`);
+                    const normalizeBal = normalizeNumber(props.balance);
+                    props.change(normalizeBal);
                 }
             }} />}
         </div> : <></>}
     </div>;
 
+    const value = useMemo(() => {
+        const amount = Number.parseFloat(`${props.value || -1}`);
+        if (props.selectedToken?.type === NATIVE && amount === props.balance) {
+            const fee = (process.env.NEXT_PUBLIC_TON_FEE || 0) as number;
+            return limitDecimals(amount - fee, props.selectedToken?.decimals || 9);
+        } else {
+            return props.value;
+        }
+    }, [props.value]);
+
     return <TokenField
         label={LabelNode}
-        value={props.value}
+        value={value}
         change={props.change}
         balance={props.balance}
         readonly={props.readonly}
