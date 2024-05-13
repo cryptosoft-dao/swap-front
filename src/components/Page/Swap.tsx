@@ -222,6 +222,13 @@ export default function Home() {
         return "";
     }, [connectionChecked, connected, sendInput.getNumberValue(), primarySelector.token]);
 
+    useEffect(() => {
+        if (!primarySelector.token) return;
+        const value = sendInput.value
+        if (value === '' || value === '-1') return;
+        sendInput.handleInput(`${limitDecimals(sendInput.getNumberValue(), primarySelector.token.decimals || 9)}`);
+    }, [primarySelector.token]);
+
     const secondaryFieldError = useMemo(() => {
         if (pool.loading || !pool.data) return "";
         return pool.data.swapable ? "" : "Token is not swapable";
@@ -339,7 +346,6 @@ export default function Home() {
                                 resetSimulator();
                                 primarySelector.toggleSelector()
                             }}
-                            readonly={isDisabled}
                             disabled={isDisabled}
                             error={primaryFieldError}
                         />
@@ -370,7 +376,7 @@ export default function Home() {
                         className="my-4"
                         disabled={isDisabled}
                     />}
-                    <div className={sendInput.focused ? "":"mb-[20px]"}>
+                    <div className={sendInput.focused ? "" : "mb-[20px]"}>
                         <Flex className="gap-2 cursor-pointer" click={() => setShow(!show)}>
                             <span className="text_14_400_SFText text-text_primary leading-[16px]">Swap details</span>
                             {simulateData.loading ? <CircularLoader className="lds-ring-mini" /> : <img src={show ? UpIcon.src : DownIcon.src} alt="arrow-down" className={`my-auto`} />}
@@ -413,7 +419,7 @@ export default function Home() {
                 </Flex>
             </PageWrapper>
 
-            {sendInput.focused ? <></>:<Footer className={`z-10 mt-auto duration-50 ease-in`} />}
+            {sendInput.focused ? <></> : <Footer className={`z-10 mt-auto duration-50 ease-in`} />}
             <SettingModal
                 active={modal === "settings" && !isDisabled}
                 slippage={slippage}

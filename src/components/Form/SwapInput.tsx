@@ -36,7 +36,7 @@ function SwapField(props: ISwapFieldProps) {
             step={"0.01"}
             onChange={(event) => {
                 if (!props.change) return;
-                let value = convertTextToNumberInput(event.currentTarget.value);
+                let value = convertTextToNumberInput(event.currentTarget.value, props.selectedToken?.decimals || 9);
                 props.change(value);
             }}
         />

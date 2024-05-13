@@ -17,13 +17,17 @@ export function normalizeNumber(number: number): number {
   return Number.parseFloat(bal);
 }
 
-export function convertTextToNumberInput(value: string) {
+export function convertTextToNumberInput(value: string, decimals: number) {
   if (value) {
     const splittedValue = value
       .replace(/[^0-9,.]/g, "")
       .replace(",", ".")
       .split(".");
     if (splittedValue.length > 2) splittedValue.pop();
+    //Limit decimals based token allowed decimals
+    if (splittedValue.length > 1 && splittedValue[1].length > decimals) {
+      splittedValue[1] = splittedValue[1].slice(0, decimals);
+    }
     value = splittedValue.join(".");
   }
   return value;
