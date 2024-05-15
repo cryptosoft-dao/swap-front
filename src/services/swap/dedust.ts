@@ -18,7 +18,7 @@ import { NATIVE } from "@/utils/token";
 import { IToken } from "@/interfaces/interface";
 
 import { calculatePriceImpact } from "@/utils/pool";
-import { IReserveRes } from "@/interfaces/request";
+import { IReserveRes, ISimulateRes } from "@/interfaces/request";
 
 export default async function swapWithDedust({
   TON_CLIENT,
@@ -70,7 +70,7 @@ export default async function swapWithDedust({
       .storeMaybeRef(null) // next ? Vault_1.Vault.packSwapStep(next) : null
       .storeRef(
         beginCell()
-          .storeUint(0, 32)   // deadline
+          .storeUint(0, 32) // deadline
           .storeAddress(null) // recipientAddress
           .storeAddress(null) // referralAddress
           // .storeAddress(Address.parse(process.env.NEXT_PUBLIC_REFERRAL_ADDRESS || WALLET_ADDRESS)) // referralAddress
@@ -90,12 +90,14 @@ export default async function swapWithDedust({
 
   // Swap Jetton to Native
   if (JETTON1.type == NATIVE) {
-    const primaryVault = TON_CLIENT.open(await factory.getJettonVault(Address.parse(JETTON0.address)));
+    const primaryVault = TON_CLIENT.open(
+      await factory.getJettonVault(Address.parse(JETTON0.address))
+    );
     // Check if vault exits:
     if ((await primaryVault.getReadinessStatus()) !== ReadinessStatus.READY) {
       throw new Error(`Vault (${JETTON0.name}) does not exist.`);
     }
-  
+
     const primaryAsset = Asset.jetton(Address.parse(JETTON0.address));
     const tonAsset = Asset.native();
 
@@ -107,9 +109,13 @@ export default async function swapWithDedust({
       throw new Error(`Pool (${JETTON0.name}, TON) does not exist.`);
     }
 
-    const primaryRoot = TON_CLIENT.open(JettonRoot.createFromAddress(Address.parse(JETTON0.address)))
-    const primaryWallet = TON_CLIENT.open(await primaryRoot.getWallet(Address.parse(WALLET_ADDRESS)));
-  
+    const primaryRoot = TON_CLIENT.open(
+      JettonRoot.createFromAddress(Address.parse(JETTON0.address))
+    );
+    const primaryWallet = TON_CLIENT.open(
+      await primaryRoot.getWallet(Address.parse(WALLET_ADDRESS))
+    );
+
     const amountIn = SWAP_AMOUNT;
     const payload = beginCell()
       .storeUint(JettonWallet.TRANSFER, 32)
@@ -120,9 +126,11 @@ export default async function swapWithDedust({
       // .storeAddress(Address.parse(process.env.NEXT_PUBLIC_REFERRAL_ADDRESS || WALLET_ADDRESS)) //responseAddress
       .storeMaybeRef(undefined) //customPayload
       .storeCoins(toNano("0.25")) //forwardAmount
-      .storeMaybeRef(VaultJetton.createSwapPayload({ poolAddress: pool.address }))
+      .storeMaybeRef(
+        VaultJetton.createSwapPayload({ poolAddress: pool.address })
+      )
       .endCell();
-  
+
     messages.push({
       address: primaryWallet.address.toString(),
       amount: toNano("0.3").toString(),
@@ -132,12 +140,16 @@ export default async function swapWithDedust({
   }
 
   // Swap Jetton to Jetton
-  const primaryVault = TON_CLIENT.open(await factory.getJettonVault(Address.parse(JETTON0.address)));
+  const primaryVault = TON_CLIENT.open(
+    await factory.getJettonVault(Address.parse(JETTON0.address))
+  );
 
   const primaryAsset = Asset.jetton(Address.parse(JETTON0.address));
-  const secondaryAsset = Asset.jetton(Address.parse(JETTON1.address));;
+  const secondaryAsset = Asset.jetton(Address.parse(JETTON1.address));
 
-  const pool = TON_CLIENT.open(await factory.getPool(PoolType.VOLATILE, [primaryAsset, secondaryAsset]));
+  const pool = TON_CLIENT.open(
+    await factory.getPool(PoolType.VOLATILE, [primaryAsset, secondaryAsset])
+  );
 
   // Check if pool exists:
   if ((await pool.getReadinessStatus()) !== ReadinessStatus.READY) {
@@ -149,8 +161,12 @@ export default async function swapWithDedust({
     throw new Error(`Vault (${JETTON0.name}) does not exist.`);
   }
 
-  const primaryRoot = TON_CLIENT.open(JettonRoot.createFromAddress(Address.parse(JETTON0.address)))
-  const primaryWallet = TON_CLIENT.open(await primaryRoot.getWallet(Address.parse(WALLET_ADDRESS)));
+  const primaryRoot = TON_CLIENT.open(
+    JettonRoot.createFromAddress(Address.parse(JETTON0.address))
+  );
+  const primaryWallet = TON_CLIENT.open(
+    await primaryRoot.getWallet(Address.parse(WALLET_ADDRESS))
+  );
 
   const amountIn = SWAP_AMOUNT;
   const payload = beginCell()
@@ -190,12 +206,15 @@ export async function getDedustPool(query: {
       query.from.type === "native"
         ? Asset.native()
         : Asset.jetton(Address.parse(query.from.address));
-    const secondaryAsset = query.to.type === "native" ? Asset.native() : Asset.jetton(Address.parse(query.to.address));
+    const secondaryAsset =
+      query.to.type === "native"
+        ? Asset.native()
+        : Asset.jetton(Address.parse(query.to.address));
 
     const pool = tonClient.open(
       await factory.getPool(PoolType.VOLATILE, [primaryAsset, secondaryAsset])
     );
-    
+
     const reserves = await pool.getReserves();
     return {
       swapable: reserves[0] + reserves[1] ? true : false,
@@ -215,7 +234,7 @@ export async function simulateDedustSwap(query: {
   to: IToken;
   amount: number;
   reserved: [number, number];
-}) {
+}): Promise<ISimulateRes> {
   try {
     const tonClient = new TonClient4({
       endpoint: "https://mainnet-v4.tonhubapi.com",
@@ -241,7 +260,7 @@ export async function simulateDedustSwap(query: {
         amountIn: BigInt(query.amount),
       });
 
-    const sendAmount = query.amount / Math.pow(10, query.from.decimals);
+    /*const sendAmount = query.amount / Math.pow(10, query.from.decimals);
     const receiveAmount =
       Number(expectedAmountOut) / Math.pow(10, query.to.decimals);
 
@@ -256,6 +275,15 @@ export async function simulateDedustSwap(query: {
           askAssetReserve: query.reserved[1],
           offerAmount: query.amount,
         }),
+      },
+    };*/
+    const sendAmount = query.amount / Math.pow(10, query.from.decimals);
+    const receiveAmount =
+      Number(expectedAmountOut) / Math.pow(10, query.to.decimals);
+    return {
+      status: "success",
+      data: {
+        swapRate: receiveAmount / sendAmount,
       },
     };
   } catch (err) {

@@ -1,10 +1,12 @@
 import { useState, useRef } from "react";
 
-import { IContent, IPool, ISimulate, IToken, MappedPool } from "@/interfaces/interface";
+import { IContent, IPool, ISimulate, IToken } from "@/interfaces/interface";
+
+import { Decimal } from "decimal.js";
 
 import { simulateStonfiSwap } from "@/services/stonfi.services";
 import { simulateDedustSwap } from "@/services/swap/dedust";
-import { limitDecimals } from "@/utils/math";
+import { useAccount } from "@/context/AccountProvider";
 
 type Simulate = ISimulate | null
 type SimulateArgs = Record<"stonfi" | "dedust", Simulate>;
@@ -27,17 +29,19 @@ function getAvgSimulatorData({ dedust, stonfi }: SimulateArgs): Simulate {
     if (!dedust && !stonfi) return null;
     if (!stonfi) return dedust;
     if (!dedust) return stonfi;
+    const dedustDecimal = new Decimal(dedust.swapRate).add(stonfi.swapRate).div(2)
     return {
-        fees: (dedust.fees + stonfi.fees) / 2,
-        amountOut: (dedust.amountOut + stonfi.amountOut) / 2,
-        swapRate: (dedust.swapRate + stonfi.swapRate) / 2,
-        priceImpact: (dedust.priceImpact + stonfi.priceImpact) / 2
+        //fees: (dedust.fees + stonfi.fees) / 2,
+        //amountOut: (dedust.amountOut + stonfi.amountOut) / BigInt(2),
+        swapRate: dedustDecimal.toNumber()
+        //priceImpact: (dedust.priceImpact + stonfi.priceImpact) / 2
     }
 }
 
 export default function useSimulate() {
 
-    const [simulateData, setSimulateData] = useState<IContent<Simulate>>({
+    const { primarySelector, secondarySelector } = useAccount();
+    const [simulateData, setSimulateData] = useState<IContent<ISimulate | null>>({
         status: "",
         loading: false,
         content: null,
@@ -65,7 +69,7 @@ export default function useSimulate() {
     }
 
     async function fetchSimulateData(args: ISimulateArgs) {
-        if (simulateData.loading || !args.primary || !args.secondary) return;
+        if (simulateData.loading || !args.primary || !args.secondary || primarySelector.selector !== "none" || secondarySelector.selector !== "none") return;
         setSimulateData((prevData) => {
             return {
                 content: prevData.content,

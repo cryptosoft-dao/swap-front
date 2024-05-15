@@ -12,7 +12,7 @@ import useSimulate, { ISimulateArgs } from "@/hooks/useSimulate";
 
 import { useAccount } from "@/context/AccountProvider";
 
-import { Flex, Grid, PageWrapper } from "@/components/wrapper";
+import { Flex, Grid } from "@/components/wrapper";
 import { MemoizedSendTokenField, MemoizedReceiveTokenField } from "@/components/Form/SwapInput";
 import { PrimaryButton } from "@/components/Form/Button";
 import { List } from "@/components/List";
@@ -38,6 +38,7 @@ import { calculateReserve, splitOfferAmount } from "@/utils/pool";
 import { IReserve, ISlippage } from "@/interfaces/interface";
 import { useTelegram } from "@/context/TelegramProvider";
 import { limitDecimals } from "@/utils/math";
+import Decimal from "decimal.js";
 
 interface INavProps {
     icon: StaticImageData;
@@ -169,14 +170,14 @@ export default function Home() {
         } catch (err) {
             // alert((err as Error).message);
             console.error(err);
+            setModal("");
         }
-        setModal("");
     }
 
     const distributionPlan = useMemo(() => {
         let reserved: Record<string, IReserve> = {};
         let loaded = false;
-        if (pool.data?.data) {
+        if (pool.data?.data && !pool.loading) {
             reserved = calculateReserve(pool.data.data);
             loaded = true;
         }
@@ -205,7 +206,7 @@ export default function Home() {
     const receiveBalance = useMemo(() => {
         const swapRate = simulateData.content?.swapRate || 0;
         if (sendInput.getNumberValue() < 0 || !sendInput.getNumberValue()) return -1;
-        const askAmount = (sendInput.getNumberValue() * swapRate);
+        const askAmount = new Decimal(swapRate).mul(sendInput.getNumberValue()).toNumber();
         return askAmount <= 0 ? -1 : Number.parseFloat(askAmount.toFixed(5));
     }, [simulateData, sendInput.getNumberValue()]);
 
@@ -222,25 +223,19 @@ export default function Home() {
         return "";
     }, [connectionChecked, connected, sendInput.getNumberValue(), primarySelector.token]);
 
-    useEffect(() => {
-        if (!primarySelector.token) return;
-        const value = sendInput.value
-        if (value === '' || value === '-1') return;
-        sendInput.handleInput(`${limitDecimals(sendInput.getNumberValue(), primarySelector.token.decimals || 9)}`);
-    }, [primarySelector.token]);
-
     const secondaryFieldError = useMemo(() => {
         if (pool.loading || !pool.data) return "";
         return pool.data.swapable ? "" : "Token is not swapable";
     }, [pool]);
 
     const simulateQuery = useMemo(() => {
-        const ready = (sendInput.inputEnd && (sendInput.getNumberValue() > 0) && primarySelector.token && secondarySelector.token && distributionPlan.loaded) ? true : false;
+        const ready = (sendInput.inputEnd && primarySelector.token && secondarySelector.token && distributionPlan.loaded) ? true : false;
+        const amount = sendInput.getNumberValue() <= 0 ? 1 : sendInput.getNumberValue();
         const query: ISimulateArgs = {
             primary: primarySelector.token,
             secondary: secondarySelector.token,
             slippage: slippage.value / 100,
-            amount: sendInput.getNumberValue() * Math.pow(10, primarySelector.token?.decimals || 9),
+            amount: amount * Math.pow(10, primarySelector.token?.decimals || 9),
             reserved: {
                 stonfi: distributionPlan.reserved.stonfi?.reserve || 0,
                 dedust: distributionPlan.reserved.dedust?.reserve || 0
@@ -255,7 +250,7 @@ export default function Home() {
             query,
             ready
         }
-    }, [sendInput.inputEnd, primarySelector.token, secondarySelector.token, slippage, distributionPlan]);
+    }, [sendInput.inputEnd, slippage, distributionPlan]);
 
     const isDisabled = useMemo(() => {
         return simulateData.loading || pool.loading || modal === "progress";
@@ -303,6 +298,13 @@ export default function Home() {
     }, [simulateQuery]);
 
     useEffect(() => {
+        if (!primarySelector.token) return;
+        const value = sendInput.value
+        if (value === '' || value === '-1') return;
+        sendInput.handleInput(`${limitDecimals(sendInput.getNumberValue(), primarySelector.token.decimals || 9)}`);
+    }, [primarySelector.token]);
+
+    useEffect(() => {
         if (webApp) {
             if (primarySelector.selector !== "none") {
                 webApp.BackButton.show();
@@ -320,105 +322,103 @@ export default function Home() {
 
     return (
         <Flex className="h-full flex-col">
-            <PageWrapper className="!overflow-y-auto">
-                <Flex className="flex-col hide-scroll">
-                    <div className="flex justify-between">
-                        <h2 className=" text-white text_20_700_SFText">Swap</h2>
-                        <div className="grid grid-cols-2 gap-2">
-                            <Nav
-                                icon={ReloadIcon}
-                                label="reload"
-                                click={reload}
-                                disabled={!simulateQuery.ready || isDisabled}
-                            />
-                            <Nav icon={SettingIcon} label="setting" click={() => setModal("settings")} />
-                        </div>
-                    </div>
-                    <Grid className="gap-4 mt-8 justify-center">
-                        <MemoizedSendTokenField
-                            inputRef={sendInput.ref}
-                            value={sendInput.value}
-                            balance={getBalance(primarySelector.token?.address || "")}
-                            change={(value) => sendInput.handleInput(`${value}`)}
-                            selectedToken={primarySelector.token}
-                            toggleSelector={() => {
-                                if (isDisabled) return;
-                                resetSimulator();
-                                primarySelector.toggleSelector()
-                            }}
-                            disabled={isDisabled}
-                            error={primaryFieldError}
+            <Flex className="flex-col p-6 !pb-0 max-w-[480px] bg-primary hide-scroll">
+                <div className="flex justify-between">
+                    <h2 className=" text-white text_20_700_SFText">Swap</h2>
+                    <div className="grid grid-cols-2 gap-2">
+                        <Nav
+                            icon={ReloadIcon}
+                            label="reload"
+                            click={reload}
+                            disabled={!simulateQuery.ready || isDisabled}
                         />
-                        <Image src={SwapIcon} alt="swap" onClick={swapToken} className="w-[15px] h-[15px] mx-auto cursor-pointer" />
-                        <MemoizedReceiveTokenField
-                            inputRef={sendInput.ref}
-                            value={receiveBalance}
-                            balance={receiveBalance}
-                            selectedToken={secondarySelector.token}
-                            toggleSelector={() => {
-                                if (isDisabled) return;
-                                resetSimulator();
-                                secondarySelector.toggleSelector()
-                            }}
-                            readonly={true}
-                            disabled={isDisabled}
-                            error={secondaryFieldError}
+                        <Nav icon={SettingIcon} label="setting" click={() => setModal("settings")} />
+                    </div>
+                </div>
+                <Grid className="gap-4 mt-8 justify-center">
+                    <MemoizedSendTokenField
+                        inputRef={sendInput.ref}
+                        value={sendInput.value}
+                        balance={getBalance(primarySelector.token?.address || "")}
+                        change={(value) => sendInput.handleInput(`${value}`)}
+                        selectedToken={primarySelector.token}
+                        toggleSelector={() => {
+                            if (isDisabled) return;
+                            primarySelector.toggleSelector()
+                        }}
+                        disabled={isDisabled}
+                        readonly={isDisabled}
+                        error={primaryFieldError}
+                    />
+                    <Image src={SwapIcon} alt="swap" onClick={swapToken} className="w-[15px] h-[15px] mx-auto cursor-pointer" />
+                    <MemoizedReceiveTokenField
+                        inputRef={sendInput.ref}
+                        value={receiveBalance}
+                        balance={receiveBalance}
+                        selectedToken={secondarySelector.token}
+                        toggleSelector={() => {
+                            if (isDisabled) return;
+                            secondarySelector.toggleSelector()
+                        }}
+                        readonly={true}
+                        disabled={isDisabled}
+                        error={secondaryFieldError}
+                    />
+                </Grid>
+                {connected ? <PrimaryButton
+                    name={modal === "progress" ? <CircularLoader className="!w-fit m-auto" /> : "Swap"}
+                    className={`my-4 ${modal === "progress" ? '!pt-3 pb-1' : ''}`}
+                    click={swap}
+                    disabled={isDisabled || sendInput.getNumberValue() <= 0}
+                /> : <PrimaryButton
+                    name={sendInput.getNumberValue() && !connected ? "Connect & Swap" : "Connect"}
+                    click={connect}
+                    className="my-4"
+                    disabled={isDisabled}
+                />}
+                <div >
+                    <Flex className="gap-2 cursor-pointer" click={() => setShow(!show)}>
+                        <span className="text_14_400_SFText text-text_primary leading-[16px]">Swap details</span>
+                        {simulateData.loading || pool.loading ? <CircularLoader className="lds-ring-mini" /> : <img src={show ? UpIcon.src : DownIcon.src} alt="arrow-down" className={`my-auto`} />}
+                    </Flex>
+
+                    <Grid className={`gap-5 my-6 ${show ? 'h-auto mb-[20px]' : 'h-0'} overflow-hidden`}>
+                        <List name="Price" value={`${simulateData?.content?.swapRate ? "1" : ""} ${primarySelector.token?.symbol || ""} ≈ ${simulateData?.content?.swapRate ? new Decimal(simulateData?.content?.swapRate).toFixed(9) : ""} ${secondarySelector?.token?.symbol || ""}`} />
+                        {/* <List name="Blockchain fee" value={`${simulateData.content?.fees || ""} ${primarySelector.token?.symbol || ""}`} /> */}
+                        <List name="Blockchain fee" value={`0.08 - 0.3 TON`} />
+                        <List
+                            name="Distribution Plan"
+                            value={distributionPlan.comp}
+                            className="!mb-auto !mt-0 !leading-[18px]"
                         />
                     </Grid>
-                    {connected ? <PrimaryButton
-                        name={modal === "progress" ? <CircularLoader className="!w-fit m-auto" /> : "Swap"}
-                        className={`my-4 ${modal === "progress" ? '!pt-3 pb-1' : ''}`}
-                        click={swap}
-                        disabled={isDisabled || sendInput.getNumberValue() <= 0}
-                    /> : <PrimaryButton
-                        name={sendInput.getNumberValue() && !connected ? "Connect & Swap" : "Connect"}
-                        click={connect}
-                        className="my-4"
-                        disabled={isDisabled}
-                    />}
-                    <div className={sendInput.focused ? "" : "mb-[20px]"}>
-                        <Flex className="gap-2 cursor-pointer" click={() => setShow(!show)}>
-                            <span className="text_14_400_SFText text-text_primary leading-[16px]">Swap details</span>
-                            {simulateData.loading ? <CircularLoader className="lds-ring-mini" /> : <img src={show ? UpIcon.src : DownIcon.src} alt="arrow-down" className={`my-auto`} />}
-                        </Flex>
+                </div>
+                {!isReady && <Loader className="fixed top-0 left-0" />}
 
-                        <Grid className={`gap-5 my-6 ${show ? 'h-auto' : 'h-0'} overflow-hidden`}>
-                            <List name="Price" value={`${simulateData?.content?.swapRate ? "1" : ""} ${primarySelector.token?.symbol || ""} ≈ ${simulateData?.content?.swapRate ? limitDecimals(simulateData?.content?.swapRate, 9) : ""} ${secondarySelector?.token?.symbol || ""}`} />
-                            {/* <List name="Blockchain fee" value={`${simulateData.content?.fees || ""} ${primarySelector.token?.symbol || ""}`} /> */}
-                            <List name="Blockchain fee" value={`0.08 - 0.3 TON`} />
-                            <List
-                                name="Distribution Plan"
-                                value={distributionPlan.comp}
-                                className="!mb-auto !mt-0 !leading-[18px]"
-                            />
-                        </Grid>
-                    </div>
-                    {!isReady && <Loader className="fixed top-0 left-0" />}
-
-                    {
-                        primarySelector.selector === 'primary' && <MemoizedSearch
-                            active={primarySelector.selector === 'primary'}
-                            selectToken={(token) => {
-                                primarySelector.selectTokenAndExit(token);
-                                if (primarySelector.token?.address !== token.address)
-                                    secondarySelector.selectToken(undefined);
-                            }}
-                            tokens={tokens}
-                        />
-                    }
-                    {
-                        secondarySelector.selector === 'secondary' && <MemoizedSearch
-                            active={secondarySelector.selector === 'secondary'}
-                            selectToken={(token) => {
-                                secondarySelector.selectToken(token);
-                                secondarySelector.toggleSelector();
-                            }}
-                            tokens={[...secondaryTokens]}
-                        />
-                    }
-                </Flex>
-            </PageWrapper>
-
+                {
+                    primarySelector.selector === 'primary' && <MemoizedSearch
+                        active={primarySelector.selector === 'primary'}
+                        selectToken={(token) => {
+                            resetSimulator();
+                            primarySelector.selectTokenAndExit(token);
+                            if (primarySelector.token?.address !== token.address)
+                                secondarySelector.selectToken(undefined);
+                        }}
+                        tokens={tokens}
+                    />
+                }
+                {
+                    secondarySelector.selector === 'secondary' && <MemoizedSearch
+                        active={secondarySelector.selector === 'secondary'}
+                        selectToken={(token) => {
+                            resetSimulator();
+                            secondarySelector.selectToken(token);
+                            secondarySelector.toggleSelector();
+                        }}
+                        tokens={[...secondaryTokens]}
+                    />
+                }
+            </Flex>
             {sendInput.focused ? <></> : <Footer className={`z-10 mt-auto duration-50 ease-in`} />}
             <SettingModal
                 active={modal === "settings" && !isDisabled}

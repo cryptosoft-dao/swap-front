@@ -51,15 +51,15 @@ export async function simulateDedustSwap(query: {
     return {
       status: "success",
       data: {
-        fees:
-          Number.parseInt(data.tradeFee) / Math.pow(10, query.from.decimals),
+        /*fees:
+          Number.parseInt(data.tradeFee) / Math.pow(10, query.from.decimals),*/
         swapRate: receiveAmount / sendAmount,
-        amountOut: receiveAmount,
+        /*amountOut: receiveAmount,
         priceImpact: calculatePriceImpact({
           offerAssetReserve: Number.parseFloat(data.pool.reserves[0]),
           askAssetReserve: Number.parseFloat(data.pool.reserves[1]),
           offerAmount: payload.amount,
-        }),
+        }),*/
       },
     };
   } catch (err) {

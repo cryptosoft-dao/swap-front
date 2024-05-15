@@ -49,11 +49,15 @@ export interface IReserve {
   reserve: number;
 }
 
-export interface ISimulate {
+export interface ISimulate_Down {
   fees: number;
   swapRate: number;
   amountOut: number;
   priceImpact: number;
+}
+
+export interface ISimulate {
+  swapRate:number;
 }
 
 export type RawAddress = string;

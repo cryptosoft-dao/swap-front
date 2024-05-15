@@ -70,7 +70,7 @@ export async function simulateStonfiSwap(query: {
     const res = await post<ISimulateStonfiData>({ url });
     if (!res.data) throw { message: "Something went wrong!" };
   
-    return {
+    /*return {
       status: "success",
       data: {
         fees:
@@ -81,7 +81,13 @@ export async function simulateStonfiSwap(query: {
           Number.parseInt(res.data.ask_units) / Math.pow(10, query.to.decimals),
         priceImpact: Number.parseFloat(res.data.price_impact),
       },
-    };
+    };*/
+    return {
+      status:"success",
+      data:{
+        swapRate: Number.parseFloat(res.data.swap_rate),
+      }
+    }
   } catch (err) {
     return {
       status: "fail",

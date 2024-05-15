@@ -53,7 +53,7 @@ function Label(props: { label: string; className?: string; click?: () => void })
 
 function TokenField(props: ITokenFieldProps) {
     return <Flex className="flex-col gap-2">
-        <Box className={`relative w-full px-[10px] py-[10px] bg-secondary ${props.error ? "!border-red" : 'border-transparent'}`}>
+        <Box className={`relative w-full px-[10px] py-[10px] bg-secondary ${props.error ? "!border-red" : 'border-transparent'} overflow-hidden`}>
             {props.label}
             <SwapField
                 value={props.value}
@@ -109,7 +109,7 @@ function SendTokenField(props: ISwapFieldProps) {
         error={props.error}
         toggleSelector={props.toggleSelector}
         disabled={props.disabled}
-        type="text"
+        type="number"
     />
 }
 

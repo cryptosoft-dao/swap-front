@@ -250,6 +250,7 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
 
         (async () => {
             if (!primarySelector.token || !secondarySelector.token) return;
+           
             setPool({
                 ...pool,
                 content: null,
@@ -297,6 +298,10 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
 
     }, [primarySelector.token, secondarySelector.token]);
 
+    const MemoizedPool = useMemo(() => {
+        return pool;
+    }, [pool]);
+
     //FETCH BALANCES ON POOL DATA AND WALLET LOAD
     useEffect(() => {
         if (!rawWalletAddress || accountBalance.loading) return;
@@ -314,8 +319,8 @@ export const AccountProvider = (props: React.PropsWithChildren) => {
             secondaryTokens: secondaryTokens,
             getBalance: getTokenBalance,
             pool: {
-                loading: pool.loading,
-                data: pool.content,
+                loading: MemoizedPool.loading,
+                data: MemoizedPool.content,
             },
             primarySelector,
             secondarySelector,

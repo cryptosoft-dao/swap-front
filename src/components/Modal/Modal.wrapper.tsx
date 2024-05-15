@@ -27,7 +27,7 @@ export function ModalWrapper(props: IModalBoxProps) {
 
 export function ModalBox(props: IModalBoxProps) {
     return <ModalWrapper active={props.active} >
-        <div className={`w-full max-w-[400px] mt-auto mx-auto rounded-tl-[20px] rounded-tr-[20px] bg-primary ${props.active ? "slideUpModal" : "translate-y-[100%] duration-75 ease-in"} ${props.styles}`}>
+        <div className={`w-full z-40 max-w-[400px] mt-auto mx-auto rounded-tl-[20px] rounded-tr-[20px] bg-primary ${props.active ? "slideUpModal" : "translate-y-[100%] duration-75 ease-in"} ${props.styles}`}>
             {props.children}
         </div>
     </ModalWrapper>

@@ -113,7 +113,9 @@ export function calculateReserve(pair: IPool) {
     percentage(totalReserved, stonfiReserved),
     3
   );
-  const dedustPercentage = limitDecimals(100 - stonfiPercentage, 3);
+  const dedustPercentage = stonfiPercentage
+    ? limitDecimals(100 - stonfiPercentage, 3)
+    : 0;
   //Calculate Percentage and sort
   const reserved: Record<string, IReserve> = {
     dedust: {

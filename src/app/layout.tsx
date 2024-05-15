@@ -1,5 +1,5 @@
 "use client"
-
+import Script from "next/script";
 import { TonConnectUIProvider } from "@tonconnect/ui-react";
 import { TelegramProvider } from "@/context/TelegramProvider"
 import { AccountProvider } from "@/context/AccountProvider";
@@ -18,7 +18,22 @@ export default function RootLayout({
 
   return (
     <html lang="en">
+
       <head>
+        <Script
+          id="load_manager"
+          strategy="lazyOnload"
+          src={`https://www.googletagmanager.com/gtag/js?id=G-7T57XV694E`}
+        />
+        <Script id="load_analytics" strategy="lazyOnload">
+          {`
+          window.dataLayer = window.dataLayer || [];
+          function gtag(){dataLayer.push(arguments);}
+          gtag('js', new Date());
+          gtag('config', 'G-7T57XV694E');
+         `}
+        </Script>
+
         <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
       </head>
       <body>

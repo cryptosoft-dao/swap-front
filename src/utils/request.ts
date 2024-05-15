@@ -12,6 +12,7 @@ export async function get<T>(option: IRequestProps): Promise<IResponse<T>> {
       headers: {
         Accept: "application/json",
       },
+      timeout:10000
     });
     return {
       status: "success",
@@ -39,6 +40,7 @@ export async function post<T>(
       headers: {
         Accept: "application/json",
       },
+      timeout:10000
     });
     return {
       status: "success",
